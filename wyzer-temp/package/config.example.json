@@ -1,0 +1,14 @@
+{
+  "server": {
+    "transport": "stdio",
+    "httpPort": 8000,
+    "httpHost": "127.0.0.1"
+  },
+  "devices": {
+    "refreshIntervalMinutes": 60
+  },
+  "monitoring": {
+    "enabled": false,
+    "logFile": "./wyzer-mcp-requests.log"
+  }
+}

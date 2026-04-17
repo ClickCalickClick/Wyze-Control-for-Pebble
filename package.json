@@ -1,0 +1,86 @@
+{
+  "name": "WyzeControl",
+  "author": "MakeAwesomeHappen",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "@rebble/clay": "^1.0.3",
+    "jpeg-js": "^0.3.7"
+  },
+  "pebble": {
+    "displayName": "WyzeControl",
+    "uuid": "56021bad-b709-491c-8c23-99455a8c32a1",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "capabilities": [
+      "configurable"
+    ],
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "AppReady",
+      "AuthStatus",
+      "DeviceCount",
+      "DeviceTypeIndex",
+      "DeviceType",
+      "DeviceIndex",
+      "DeviceName",
+      "DeviceState",
+      "DeviceOnline",
+      "ActionToggle",
+      "ActionRefresh",
+      "ActionLogout",
+      "WyzeEmail",
+      "WyzePassword",
+      "WyzeKeyID",
+      "WyzeAPIKey",
+      "WyzeLogout",
+      "ActionType",
+      "ActionValue",
+      "ScaleWeight",
+      "ScaleBodyFat",
+      "ScaleBMI",
+      "ScaleMuscle",
+      "ScaleWater",
+      "ScaleDate",
+      "ShortcutCount",
+      "ShortcutIndex",
+      "ShortcutName",
+      "ShortcutTrigger",
+      "CameraRequest",
+      "CameraEventType",
+      "CameraEventTime",
+      "CameraChunkIndex",
+      "CameraChunkTotal",
+      "CameraChunkData",
+      "CameraWidth",
+      "CameraHeight",
+      "DeviceHasGarage",
+      "GarageRequest",
+      "TestAuth"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  }
+}

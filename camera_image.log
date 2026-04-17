@@ -1,0 +1,161 @@
+# Camera Image Pipeline — Development Log
+
+## Goal
+Display live Wyze camera event thumbnail images on the Pebble watch.
+User selects a camera → watch fetches the latest event → downloads the JPEG thumbnail → 
+decodes it → converts to Pebble 8-bit color → sends in chunks → displays on watch.
+
+## Status: WORKING (as of 2026-04-16)
+
+The full pipeline is functional on the basalt emulator. A real camera image (Backdoor, 
+motion event) displays correctly on the Pebble watch screen at 144×84 pixels.
+
+---
+
+## Architecture
+
+### Pipeline Flow
+1. Watch sends CameraRequest with device MAC
+2. PKJS calls Wyze `get_event_list` API (iOS-style params)
+3. PKJS sends event info (type + time) to watch via AppMessage
+4. PKJS downloads JPEG thumbnail from `prod-sight-safe-auth.wyze.com`
+5. PKJS decodes JPEG (jpeg-js library, bundled ~60KB)
+6. PKJS resizes 640×360 → 144×84 (nearest-neighbor)
+7. PKJS converts to Pebble GBitmapFormat8Bit (0xC0 | R>>6<<4 | G>>6<<2 | B>>6)
+8. PKJS sends 12096 bytes in 9 chunks of 1500 bytes each
+9. Watch reassembles chunks, creates GBitmap, displays
+
+### Key Constants
+- CAM_TARGET_W = 144, CAM_TARGET_H = 84
+- CAM_CHUNK_SIZE = 1500 bytes
+- Total image size = 12096 bytes (144 × 84 × 1 byte per pixel)
+
+---
+
+## Problems Encountered & Solutions
+
+### 1. Emulator Crash — toLocaleTimeString() (SOLVED)
+**Symptom:** pypkjs V8 runtime crashes immediately when camera window opens.
+**Root Cause:** `new Date(ts).toLocaleTimeString()` crashes the STPyV8 engine.
+**Fix:** Replaced with manual formatting using `getHours()` / `getMinutes()`.
+
+### 2. Image Download 401 (SOLVED)
+**Symptom:** HTTP 401 when downloading image thumbnail from `prod-sight-safe-auth.wyze.com`.
+**Root Cause:** Android-style API params (`sc`/`sv`) generate URLs with tokens that 
+require matching app identity. The iOS-style params from docker-wyze-bridge work.
+**Fix:** Use iOS-style constants:
+  - sc: '9f275790cab94a72bd206c8876429f3c'
+  - sv: '782ced6909a44d92a1f70d582bbe88be'  
+  - app_name: 'com.hualai.WyzeCam'
+  - phone_system_type: 1 (iOS)
+  - User-Agent: 'Wyze/2.50.6.9 (iPhone; iOS 17.0; Scale/3.00)'
+
+### 3. Non-auth Domain Hangs (SOLVED — avoided)
+**Symptom:** Replacing `prod-sight-safe-auth.wyze.com` with `prod-sight-safe.wyze.com` 
+causes the request to hang indefinitely.
+**Fix:** Keep the original auth domain. The `st` tokens from iOS-style event list 
+response are valid and download succeeds with HTTP 200.
+
+### 4. Binary Data Extraction from pypkjs XHR (SOLVED — required pypkjs patch)
+This was the hardest problem. pypkjs uses STPyV8 (Python↔V8 bridge via Boost.Python) 
+which has severe limitations handling binary data.
+
+**Approaches tried (all failed):**
+
+a) `responseType = 'arraybuffer'` (original pypkjs code):
+   - Returns a Boost.Python wrapped JSObject
+   - `typeof response` = "function" (not "object")  
+   - `response.byteLength` works (returns 30214)
+   - `response[0]` fails — Boost.Python error
+   - `new DataView(response)` fails — "must be an ArrayBuffer"
+   - `new Uint8Array(response)` returns 0-length array
+   - `response.slice()` fails
+
+b) `responseText` (text fallback):
+   - Always UTF-8 decoded by pypkjs Python `requests` library
+   - High bytes (>=0x80) get mangled to U+FFFD replacement characters
+   - Length 28661 vs actual 30214 — data loss
+   - `overrideMimeType('text/plain; charset=x-user-defined')` ignored by pypkjs
+   - `overrideMimeType('text/plain; charset=iso-8859-1')` also ignored
+
+c) First pypkjs patch — return Uint8Array directly (removed `.buffer`):
+   - Changed to `v8.JSObject.create(Uint8Array, (JSArray,))` without `.buffer`
+   - `response.length` = 30214 (correct!)
+   - `response[i]` fails: "object of type 'JSObject' has no len()"
+   - STPyV8 can't index into TypedArrays
+
+d) Second pypkjs patch — return plain JSArray:
+   - Changed to `v8.JSArray(list(bytearray(self._response.content)))`
+   - **Crashed the emulator** — creating a 30K-element JSArray through 
+     STPyV8 is too heavy / crashes the V8 runtime
+
+e) **WORKING: Third pypkjs patch — return base64 string:**
+   - Changed to `base64.b64encode(self._response.content).decode('ascii')`
+   - Returns a plain ASCII string (40288 chars for 30214 bytes)
+   - Strings pass through STPyV8 bridge perfectly
+   - JS decodes base64 manually (atob not available in pypkjs)
+
+**pypkjs patch location:**
+`~/.local/share/uv/tools/pebble-tool/lib/python3.13/site-packages/pypkjs/javascript/xhr.py`
+
+```python
+# Line 145-147, inside the send() method:
+elif self.responseType == "arraybuffer":
+    import base64
+    self.response = base64.b64encode(self._response.content).decode('ascii')
+```
+
+### 5. atob() Not Available in pypkjs (SOLVED)
+**Symptom:** `ReferenceError: atob is not defined` when trying to decode base64.
+**Root Cause:** pypkjs V8 runtime doesn't include browser globals like `atob`/`btoa`.
+**Fix:** Implemented manual base64 decoder in JS:
+  - Build lookup table from 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  - Process 4 base64 chars → 3 bytes at a time
+  - Store directly into Uint8Array
+
+---
+
+## pypkjs Limitations Discovered
+
+These are specific to the Pebble emulator's JavaScript runtime (pypkjs + STPyV8).
+On a real Pebble phone with PebbleKit JS, none of these apply.
+
+1. **toLocaleTimeString()** crashes V8
+2. **ArrayBuffer** objects from STPyV8 are unusable (typeof="function", no byte access)
+3. **Uint8Array** objects from STPyV8 can't be indexed with `[i]`
+4. **JSArray with 30K+ elements** crashes the runtime
+5. **responseText** is always UTF-8 decoded — binary data gets corrupted
+6. **overrideMimeType()** is ignored
+7. **atob() / btoa()** not available
+8. **Buffer** global not available
+
+**Working workaround:** Return binary data as base64 string from Python side, 
+decode manually in JS.
+
+---
+
+## Real Hardware Note
+
+The pypkjs base64 patch is ONLY needed for the emulator. On a real Pebble phone:
+- `responseType = 'arraybuffer'` works correctly
+- `atob()` is available  
+- The JS code includes a fallback: if `typeof response === 'string'` → base64 decode path;
+  otherwise would need the standard ArrayBuffer path (not yet implemented since real 
+  hardware testing isn't available)
+
+TODO: Add a standard ArrayBuffer handling path for real hardware compatibility.
+
+---
+
+## Test Results (2026-04-16)
+
+```
+Event fetch:     HTTP 200, code=1, 1 event
+Event type:      Motion
+Event time:      12:37 PM  
+Image download:  HTTP 200, 30214 bytes (base64: 40288 chars)
+JPEG header:     ff d8 ff e0 (valid JPEG/JFIF)
+JPEG decode:     640×360 pixels
+Pebble convert:  144×84 pixels, 12096 bytes, 9 chunks
+Display:         SUCCESS — image visible on watch
+```
