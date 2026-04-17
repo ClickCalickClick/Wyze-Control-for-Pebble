@@ -1,5 +1,5 @@
 {
-    "displayName": "Wyze Control",
+    "displayName": "WyzeControl",
     "uuid": "56021bad-b709-491c-8c23-99455a8c32a1",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -74,7 +74,7 @@
     "shortName": "WyzeControl",
     "longName": "WyzeControl",
     "versionLabel": "1.0",
-    "companyName": "ClickCalickClick",
+    "companyName": "MakeAwesomeHappen",
     "appKeys": {
         "AppReady": 10000,
         "AuthStatus": 10001,

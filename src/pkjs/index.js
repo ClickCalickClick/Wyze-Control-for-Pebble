@@ -734,9 +734,16 @@ function fetchCameraEvent(id) {
           console.log('DEBUG: event keys=' + Object.keys(event).join(','));
           
           // Send event info to watch
+          var TAG_NAMES = {1:'Motion',2:'Sound',101:'Motion',110:'Person',111:'Vehicle',112:'Pet',113:'Package'};
+          var EVENT_VAL_NAMES = {'1':'Motion','2':'Sound'};
           var eventType = '';
           if (event.tag_list && event.tag_list.length > 0) {
-            eventType = event.tag_list.join(', ');
+            eventType = event.tag_list.map(function(t) {
+              return TAG_NAMES[t] || TAG_NAMES[String(t)] || ('Tag ' + t);
+            }).join(', ');
+          }
+          if (!eventType && event.event_value) {
+            eventType = EVENT_VAL_NAMES[String(event.event_value)] || '';
           }
           if (!eventType) eventType = 'Motion';
           console.log('DEBUG: eventType=' + eventType);
