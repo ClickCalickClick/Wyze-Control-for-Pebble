@@ -1433,7 +1433,7 @@ LOAD aplite/appinfo.auto.c.57.o
 LOAD aplite/src/resource_ids.auto.c.57.o
 LOAD src/message_keys.auto.c.57.o
 LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a
-LOAD /Users/jaredwuerzburger/Documents/GitHub/WyzeControl/WyzeControl/node_modules/@rebble/clay/dist/binaries/aplite/@rebble/libclay.a
+LOAD /Users/jaredwuerzburger/Documents/GitHub/Wyze-Control-for-Pebble/node_modules/@rebble/clay/dist/binaries/aplite/@rebble/libclay.a
 START GROUP
 LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/libgcc.a
 LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a
@@ -1454,7 +1454,7 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
  .note.gnu.build-id
                 0x00000084       0x24 linker stubs
 
-.text           0x000000a8     0x2d78
+.text           0x000000a8     0x2cf8
  *(.text)
  .text          0x000000a8       0x14 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  *(.text.*)
@@ -1605,594 +1605,591 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
                 0x00001960       0x6c src/c/window_actions.c.57.o
                 0x00001960                window_device_action_push
  .text.window_unload
-                0x000019cc       0x68 src/c/window_camera.c.57.o
+                0x000019cc       0x58 src/c/window_camera.c.57.o
  .text.window_appear
-                0x00001a34       0xf0 src/c/window_camera.c.57.o
+                0x00001a24       0xf0 src/c/window_camera.c.57.o
  .text.window_load
-                0x00001b24      0x200 src/c/window_camera.c.57.o
+                0x00001b14      0x1a0 src/c/window_camera.c.57.o
  .text.window_camera_receive_event
-                0x00001d24       0xb8 src/c/window_camera.c.57.o
-                0x00001d24                window_camera_receive_event
+                0x00001cb4       0xb8 src/c/window_camera.c.57.o
+                0x00001cb4                window_camera_receive_event
  .text.window_camera_receive_chunk
-                0x00001ddc        0x2 src/c/window_camera.c.57.o
-                0x00001ddc                window_camera_receive_chunk
- *fill*         0x00001dde        0x2 
+                0x00001d6c        0x2 src/c/window_camera.c.57.o
+                0x00001d6c                window_camera_receive_chunk
+ *fill*         0x00001d6e        0x2 
  .text.window_camera_push
-                0x00001de0       0x9c src/c/window_camera.c.57.o
-                0x00001de0                window_camera_push
+                0x00001d70       0x9c src/c/window_camera.c.57.o
+                0x00001d70                window_camera_push
  .text.window_unload
-                0x00001e7c       0x4c src/c/window_garage.c.57.o
+                0x00001e0c       0x4c src/c/window_garage.c.57.o
  .text.window_load
-                0x00001ec8      0x15c src/c/window_garage.c.57.o
+                0x00001e58      0x15c src/c/window_garage.c.57.o
  .text.click_config_provider
-                0x00002024       0x10 src/c/window_garage.c.57.o
+                0x00001fb4       0x10 src/c/window_garage.c.57.o
  .text.select_handler
-                0x00002034       0x54 src/c/window_garage.c.57.o
+                0x00001fc4       0x54 src/c/window_garage.c.57.o
  .text.window_appear
-                0x00002088       0x84 src/c/window_garage.c.57.o
+                0x00002018       0x84 src/c/window_garage.c.57.o
  .text.window_garage_refresh
-                0x0000210c       0x9c src/c/window_garage.c.57.o
-                0x0000210c                window_garage_refresh
+                0x0000209c       0x9c src/c/window_garage.c.57.o
+                0x0000209c                window_garage_refresh
  .text.window_garage_receive_chunk
-                0x000021a8        0x2 src/c/window_garage.c.57.o
-                0x000021a8                window_garage_receive_chunk
+                0x00002138        0x2 src/c/window_garage.c.57.o
+                0x00002138                window_garage_receive_chunk
  .text.window_garage_receive_event
-                0x000021aa        0x2 src/c/window_garage.c.57.o
-                0x000021aa                window_garage_receive_event
+                0x0000213a        0x2 src/c/window_garage.c.57.o
+                0x0000213a                window_garage_receive_event
  .text.window_garage_push
-                0x000021ac       0x60 src/c/window_garage.c.57.o
-                0x000021ac                window_garage_push
+                0x0000213c       0x60 src/c/window_garage.c.57.o
+                0x0000213c                window_garage_push
  .text.menu_get_num_sections_callback
-                0x0000220c        0x4 src/c/window_picker.c.57.o
+                0x0000219c        0x4 src/c/window_picker.c.57.o
  .text.menu_get_num_rows_callback
-                0x00002210        0xc src/c/window_picker.c.57.o
+                0x000021a0        0xc src/c/window_picker.c.57.o
  .text.window_unload
-                0x0000221c       0x38 src/c/window_picker.c.57.o
+                0x000021ac       0x38 src/c/window_picker.c.57.o
  .text.window_load
-                0x00002254       0xd0 src/c/window_picker.c.57.o
+                0x000021e4       0xd0 src/c/window_picker.c.57.o
  .text.menu_select_callback
-                0x00002324       0x34 src/c/window_picker.c.57.o
+                0x000022b4       0x34 src/c/window_picker.c.57.o
  .text.menu_draw_row_callback
-                0x00002358       0x2c src/c/window_picker.c.57.o
+                0x000022e8       0x2c src/c/window_picker.c.57.o
  .text.window_picker_push
-                0x00002384       0x7c src/c/window_picker.c.57.o
-                0x00002384                window_picker_push
+                0x00002314       0x7c src/c/window_picker.c.57.o
+                0x00002314                window_picker_push
  .text.window_unload
-                0x00002400       0x58 src/c/window_scale.c.57.o
+                0x00002390       0x58 src/c/window_scale.c.57.o
  .text.window_load
-                0x00002458      0x184 src/c/window_scale.c.57.o
+                0x000023e8      0x184 src/c/window_scale.c.57.o
  .text.update_ui
-                0x000025dc       0x9c src/c/window_scale.c.57.o
+                0x0000256c       0x9c src/c/window_scale.c.57.o
  .text.window_appear
-                0x00002678       0x38 src/c/window_scale.c.57.o
+                0x00002608       0x38 src/c/window_scale.c.57.o
  .text.window_scale_refresh
-                0x000026b0       0x14 src/c/window_scale.c.57.o
-                0x000026b0                window_scale_refresh
+                0x00002640       0x14 src/c/window_scale.c.57.o
+                0x00002640                window_scale_refresh
  .text.window_scale_push
-                0x000026c4       0x7c src/c/window_scale.c.57.o
-                0x000026c4                window_scale_push
+                0x00002654       0x7c src/c/window_scale.c.57.o
+                0x00002654                window_scale_push
  .text.app_event_loop
-                0x00002740        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002740                app_event_loop
- .text.app_log  0x0000274c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000274c                app_log
+                0x000026d0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000026d0                app_event_loop
+ .text.app_log  0x000026dc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000026dc                app_log
  .text.app_message_open
-                0x00002758        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002758                app_message_open
+                0x000026e8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000026e8                app_message_open
  .text.app_timer_cancel
-                0x00002764        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002764                app_timer_cancel
+                0x000026f4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000026f4                app_timer_cancel
  .text.app_timer_register
-                0x00002770        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002770                app_timer_register
+                0x00002700        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002700                app_timer_register
  .text.dict_find
-                0x0000277c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000277c                dict_find
+                0x0000270c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000270c                dict_find
  .text.dict_write_int32
-                0x00002788        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002788                dict_write_int32
+                0x00002718        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002718                dict_write_int32
  .text.dict_write_uint8
-                0x00002794        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002794                dict_write_uint8
+                0x00002724        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002724                dict_write_uint8
  .text.fonts_get_system_font
-                0x000027a0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027a0                fonts_get_system_font
+                0x00002730        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002730                fonts_get_system_font
  .text.layer_add_child
-                0x000027ac        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027ac                layer_add_child
+                0x0000273c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000273c                layer_add_child
  .text.layer_get_bounds
-                0x000027b8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027b8                layer_get_bounds
- .text.memcpy   0x000027c4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027c4                memcpy
- .text.memset   0x000027d0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027d0                memset
+                0x00002748        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002748                layer_get_bounds
+ .text.memcpy   0x00002754        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002754                memcpy
+ .text.memset   0x00002760        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002760                memset
  .text.menu_cell_basic_draw
-                0x000027dc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027dc                menu_cell_basic_draw
+                0x0000276c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000276c                menu_cell_basic_draw
  .text.menu_layer_destroy
-                0x000027e8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027e8                menu_layer_destroy
+                0x00002778        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002778                menu_layer_destroy
  .text.menu_layer_get_layer
-                0x000027f4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000027f4                menu_layer_get_layer
+                0x00002784        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002784                menu_layer_get_layer
  .text.menu_layer_get_selected_index
-                0x00002800        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002800                menu_layer_get_selected_index
+                0x00002790        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002790                menu_layer_get_selected_index
  .text.menu_layer_reload_data
-                0x0000280c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000280c                menu_layer_reload_data
+                0x0000279c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000279c                menu_layer_reload_data
  .text.menu_layer_set_click_config_onto_window
-                0x00002818        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002818                menu_layer_set_click_config_onto_window
+                0x000027a8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027a8                menu_layer_set_click_config_onto_window
  .text.menu_layer_set_selected_next
-                0x00002824        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002824                menu_layer_set_selected_next
+                0x000027b4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027b4                menu_layer_set_selected_next
  .text.snprintf
-                0x00002830        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002830                snprintf
- .text.strcpy   0x0000283c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000283c                strcpy
- .text.strncpy  0x00002848        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002848                strncpy
+                0x000027c0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027c0                snprintf
+ .text.strcpy   0x000027cc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027cc                strcpy
+ .text.strncpy  0x000027d8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027d8                strncpy
  .text.vibes_short_pulse
-                0x00002854        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002854                vibes_short_pulse
+                0x000027e4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027e4                vibes_short_pulse
  .text.window_create
-                0x00002860        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002860                window_create
+                0x000027f0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027f0                window_create
  .text.window_destroy
-                0x0000286c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000286c                window_destroy
+                0x000027fc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000027fc                window_destroy
  .text.window_get_root_layer
-                0x00002878        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002878                window_get_root_layer
+                0x00002808        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002808                window_get_root_layer
  .text.window_set_click_config_provider
-                0x00002884        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002884                window_set_click_config_provider
+                0x00002814        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002814                window_set_click_config_provider
  .text.window_set_window_handlers
-                0x00002890        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002890                window_set_window_handlers
+                0x00002820        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002820                window_set_window_handlers
  .text.window_stack_pop
-                0x0000289c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000289c                window_stack_pop
+                0x0000282c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000282c                window_stack_pop
  .text.window_stack_push
-                0x000028a8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028a8                window_stack_push
+                0x00002838        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002838                window_stack_push
  .text.app_message_inbox_size_maximum
-                0x000028b4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028b4                app_message_inbox_size_maximum
+                0x00002844        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002844                app_message_inbox_size_maximum
  .text.app_message_outbox_begin
-                0x000028c0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028c0                app_message_outbox_begin
+                0x00002850        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002850                app_message_outbox_begin
  .text.app_message_outbox_send
-                0x000028cc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028cc                app_message_outbox_send
+                0x0000285c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000285c                app_message_outbox_send
  .text.app_message_register_inbox_dropped
-                0x000028d8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028d8                app_message_register_inbox_dropped
+                0x00002868        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002868                app_message_register_inbox_dropped
  .text.app_message_register_inbox_received
-                0x000028e4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028e4                app_message_register_inbox_received
+                0x00002874        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002874                app_message_register_inbox_received
  .text.window_long_click_subscribe
-                0x000028f0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028f0                window_long_click_subscribe
+                0x00002880        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002880                window_long_click_subscribe
  .text.window_single_click_subscribe
-                0x000028fc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000028fc                window_single_click_subscribe
+                0x0000288c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000288c                window_single_click_subscribe
  .text.window_single_repeating_click_subscribe
-                0x00002908        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002908                window_single_repeating_click_subscribe
+                0x00002898        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002898                window_single_repeating_click_subscribe
  .text.menu_layer_create
-                0x00002914        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002914                menu_layer_create
+                0x000028a4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028a4                menu_layer_create
  .text.text_layer_create
-                0x00002920        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002920                text_layer_create
+                0x000028b0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028b0                text_layer_create
  .text.text_layer_destroy
-                0x0000292c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000292c                text_layer_destroy
+                0x000028bc        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028bc                text_layer_destroy
  .text.text_layer_get_layer
-                0x00002938        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002938                text_layer_get_layer
+                0x000028c8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028c8                text_layer_get_layer
  .text.text_layer_set_background_color
-                0x00002944        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002944                text_layer_set_background_color
+                0x000028d4        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028d4                text_layer_set_background_color
  .text.text_layer_set_font
-                0x00002950        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002950                text_layer_set_font
+                0x000028e0        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028e0                text_layer_set_font
  .text.text_layer_set_text
-                0x0000295c        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000295c                text_layer_set_text
+                0x000028ec        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028ec                text_layer_set_text
  .text.text_layer_set_text_alignment
-                0x00002968        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002968                text_layer_set_text_alignment
+                0x000028f8        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000028f8                text_layer_set_text_alignment
  .text.text_layer_set_text_color
-                0x00002974        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002974                text_layer_set_text_color
+                0x00002904        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002904                text_layer_set_text_color
  .text.menu_layer_set_callbacks
-                0x00002980        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00002980                menu_layer_set_callbacks
+                0x00002910        0xc /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00002910                menu_layer_set_callbacks
  *(.rodata)
  *(.rodata*)
  .rodata.in_dropped_handler.str1.1
-                0x0000298c      0x459 src/c/WyzeControl.c.57.o
+                0x0000291c      0x44c src/c/WyzeControl.c.57.o
                                  0x2e (size before relaxing)
  .rodata.in_recv_handler.str1.1
-                0x00002de5       0x87 src/c/WyzeControl.c.57.o
+                0x00002d68       0x87 src/c/WyzeControl.c.57.o
  .rodata.menu_draw_row_callback.str1.1
-                0x00002de5       0x49 src/c/menu_devices.c.57.o
+                0x00002d68       0x49 src/c/menu_devices.c.57.o
  .rodata.menu_select_callback.str1.1
-                0x00002de5       0x11 src/c/menu_light_actions.c.57.o
+                0x00002d68       0x11 src/c/menu_light_actions.c.57.o
  .rodata.menu_draw_row_callback.str1.1
-                0x00002de5       0x1c src/c/menu_light_actions.c.57.o
+                0x00002d68       0x1c src/c/menu_light_actions.c.57.o
  .rodata.str1.1
-                0x00002de5       0x3a src/c/menu_light_actions.c.57.o
- *fill*         0x00002de5        0x3 
+                0x00002d68       0x3a src/c/menu_light_actions.c.57.o
  .rodata.s_brightness_values
-                0x00002de8       0x14 src/c/menu_light_actions.c.57.o
+                0x00002d68       0x14 src/c/menu_light_actions.c.57.o
  .rodata.window_load.str1.1
-                0x00002dfc       0x1b src/c/menu_shortcuts.c.57.o
+                0x00002d7c       0x1b src/c/menu_shortcuts.c.57.o
  .rodata.confirm_timer_callback.str1.1
-                0x00002dfc        0x1 src/c/menu_shortcuts.c.57.o
+                0x00002d7c        0x1 src/c/menu_shortcuts.c.57.o
  .rodata.menu_select_callback.str1.1
-                0x00002dfc        0xb src/c/menu_shortcuts.c.57.o
+                0x00002d7c        0xb src/c/menu_shortcuts.c.57.o
  .rodata.menu_draw_row_callback.str1.1
-                0x00002dfc       0x2e src/c/menu_shortcuts.c.57.o
+                0x00002d7c       0x2e src/c/menu_shortcuts.c.57.o
  .rodata.menu_draw_row_callback.str1.1
-                0x00002dfc       0x5e src/c/menu_types.c.57.o
+                0x00002d7c       0x5e src/c/menu_types.c.57.o
  .rodata.s_type_indices
-                0x00002dfc       0x24 src/c/menu_types.c.57.o
+                0x00002d7c       0x24 src/c/menu_types.c.57.o
  .rodata.str1.1
-                0x00002e20       0x4b src/c/menu_types.c.57.o
+                0x00002da0       0x4b src/c/menu_types.c.57.o
  .rodata.setup_title_bar.str1.1
-                0x00002e20       0x28 src/c/title_bar.c.57.o
+                0x00002da0       0x28 src/c/title_bar.c.57.o
  .rodata.update_ui.str1.1
-                0x00002e20       0x73 src/c/window_actions.c.57.o
+                0x00002da0       0x73 src/c/window_actions.c.57.o
  .rodata.select_click_handler.str1.1
-                0x00002e20       0x38 src/c/window_actions.c.57.o
+                0x00002da0       0x38 src/c/window_actions.c.57.o
  .rodata.window_appear.str1.1
-                0x00002e20       0x64 src/c/window_camera.c.57.o
+                0x00002da0       0x64 src/c/window_camera.c.57.o
  .rodata.window_load.str1.1
-                0x00002e20       0x68 src/c/window_camera.c.57.o
+                0x00002da0       0x5b src/c/window_camera.c.57.o
  .rodata.window_camera_receive_event.str1.1
-                0x00002e20       0x25 src/c/window_camera.c.57.o
+                0x00002da0       0x25 src/c/window_camera.c.57.o
  .rodata.window_camera_push.str1.1
-                0x00002e20       0x18 src/c/window_camera.c.57.o
+                0x00002da0       0x18 src/c/window_camera.c.57.o
  .rodata.window_load.str1.1
-                0x00002e20       0x60 src/c/window_garage.c.57.o
+                0x00002da0       0x60 src/c/window_garage.c.57.o
  .rodata.select_handler.str1.1
-                0x00002e20        0xb src/c/window_garage.c.57.o
+                0x00002da0        0xb src/c/window_garage.c.57.o
  .rodata.window_appear.str1.1
-                0x00002e20       0x14 src/c/window_garage.c.57.o
+                0x00002da0       0x14 src/c/window_garage.c.57.o
  .rodata.window_load.str1.1
-                0x00002e20       0x57 src/c/window_scale.c.57.o
+                0x00002da0       0x57 src/c/window_scale.c.57.o
  .rodata.update_ui.str1.1
-                0x00002e20       0x27 src/c/window_scale.c.57.o
+                0x00002da0       0x27 src/c/window_scale.c.57.o
 
-.glue_7         0x00002e20        0x0
- .glue_7        0x00002e20        0x0 linker stubs
+.glue_7         0x00002da0        0x0
+ .glue_7        0x00002da0        0x0 linker stubs
 
-.glue_7t        0x00002e20        0x0
- .glue_7t       0x00002e20        0x0 linker stubs
+.glue_7t        0x00002da0        0x0
+ .glue_7t       0x00002da0        0x0 linker stubs
 
-.vfp11_veneer   0x00002e20        0x0
- .vfp11_veneer  0x00002e20        0x0 linker stubs
+.vfp11_veneer   0x00002da0        0x0
+ .vfp11_veneer  0x00002da0        0x0 linker stubs
 
-.v4_bx          0x00002e20        0x0
- .v4_bx         0x00002e20        0x0 linker stubs
+.v4_bx          0x00002da0        0x0
+ .v4_bx         0x00002da0        0x0 linker stubs
 
-.init           0x00002e20        0x4
- .init          0x00002e20        0x4 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
-                0x00002e20                _init
+.init           0x00002da0        0x4
+ .init          0x00002da0        0x4 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+                0x00002da0                _init
 
-.fini           0x00002e24        0x4
- .fini          0x00002e24        0x4 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
-                0x00002e24                _fini
+.fini           0x00002da4        0x4
+ .fini          0x00002da4        0x4 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+                0x00002da4                _fini
 
-.iplt           0x00002e28        0x0
- .iplt          0x00002e28        0x0 src/c/WyzeControl.c.57.o
+.iplt           0x00002da8        0x0
+ .iplt          0x00002da8        0x0 src/c/WyzeControl.c.57.o
 
-.rel.dyn        0x00002e28        0x0
- .rel.iplt      0x00002e28        0x0 src/c/WyzeControl.c.57.o
- .rel.got       0x00002e28        0x0 src/c/WyzeControl.c.57.o
+.rel.dyn        0x00002da8        0x0
+ .rel.iplt      0x00002da8        0x0 src/c/WyzeControl.c.57.o
+ .rel.got       0x00002da8        0x0 src/c/WyzeControl.c.57.o
 
-.data           0x00002e28       0xe8
+.data           0x00002da8       0xe8
  *(.data)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtbegin.o
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/crt0.o
- .data          0x00002e28        0x0 src/c/WyzeControl.c.57.o
- .data          0x00002e28        0x0 src/c/menu_devices.c.57.o
- .data          0x00002e28        0x0 src/c/menu_light_actions.c.57.o
- .data          0x00002e28        0x0 src/c/menu_shortcuts.c.57.o
- .data          0x00002e28        0x0 src/c/menu_types.c.57.o
- .data          0x00002e28        0x0 src/c/title_bar.c.57.o
- .data          0x00002e28        0x0 src/c/window_actions.c.57.o
- .data          0x00002e28        0x0 src/c/window_camera.c.57.o
- .data          0x00002e28        0x0 src/c/window_garage.c.57.o
- .data          0x00002e28        0x0 src/c/window_picker.c.57.o
- .data          0x00002e28        0x0 src/c/window_scale.c.57.o
- .data          0x00002e28        0x0 aplite/appinfo.auto.c.57.o
- .data          0x00002e28        0x0 aplite/src/resource_ids.auto.c.57.o
- .data          0x00002e28        0x0 src/message_keys.auto.c.57.o
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-exit.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fwalk.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-stdio.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-closer.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-reent.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lseekr.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-readr.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-writer.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
- .data          0x00002e28        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crti.o
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtbegin.o
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/crt0.o
+ .data          0x00002da8        0x0 src/c/WyzeControl.c.57.o
+ .data          0x00002da8        0x0 src/c/menu_devices.c.57.o
+ .data          0x00002da8        0x0 src/c/menu_light_actions.c.57.o
+ .data          0x00002da8        0x0 src/c/menu_shortcuts.c.57.o
+ .data          0x00002da8        0x0 src/c/menu_types.c.57.o
+ .data          0x00002da8        0x0 src/c/title_bar.c.57.o
+ .data          0x00002da8        0x0 src/c/window_actions.c.57.o
+ .data          0x00002da8        0x0 src/c/window_camera.c.57.o
+ .data          0x00002da8        0x0 src/c/window_garage.c.57.o
+ .data          0x00002da8        0x0 src/c/window_picker.c.57.o
+ .data          0x00002da8        0x0 src/c/window_scale.c.57.o
+ .data          0x00002da8        0x0 aplite/appinfo.auto.c.57.o
+ .data          0x00002da8        0x0 aplite/src/resource_ids.auto.c.57.o
+ .data          0x00002da8        0x0 src/message_keys.auto.c.57.o
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-exit.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-findfp.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-impure.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mallocr.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-mlock.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fwalk.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fclose.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fflush.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-stdio.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-closer.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-reent.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lseekr.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-readr.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sbrkr.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-writer.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-sysconf.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-freer.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
+ .data          0x00002da8        0x0 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtn.o
  *(.data.*)
  .data.s_last_color
-                0x00002e28        0x4 src/c/menu_light_actions.c.57.o
+                0x00002da8        0x4 src/c/menu_light_actions.c.57.o
  .data.s_last_brightness
-                0x00002e2c        0x4 src/c/menu_light_actions.c.57.o
+                0x00002dac        0x4 src/c/menu_light_actions.c.57.o
  .data.rel.local.s_color_options
-                0x00002e30       0x14 src/c/menu_light_actions.c.57.o
+                0x00002db0       0x14 src/c/menu_light_actions.c.57.o
  .data.rel.local.s_brightness_options
-                0x00002e44       0x14 src/c/menu_light_actions.c.57.o
+                0x00002dc4       0x14 src/c/menu_light_actions.c.57.o
  .data.s_device_index
-                0x00002e58        0x4 src/c/menu_light_actions.c.57.o
+                0x00002dd8        0x4 src/c/menu_light_actions.c.57.o
  .data.rel.ro.local.s_type_names
-                0x00002e5c       0x24 src/c/menu_types.c.57.o
+                0x00002ddc       0x24 src/c/menu_types.c.57.o
  .data.s_device_index
-                0x00002e80        0x4 src/c/window_actions.c.57.o
+                0x00002e00        0x4 src/c/window_actions.c.57.o
  .data.s_device_index
-                0x00002e84        0x4 src/c/window_camera.c.57.o
+                0x00002e04        0x4 src/c/window_camera.c.57.o
  .data.s_device_index
-                0x00002e88        0x4 src/c/window_garage.c.57.o
+                0x00002e08        0x4 src/c/window_garage.c.57.o
  .data.s_device_index
-                0x00002e8c        0x4 src/c/window_scale.c.57.o
+                0x00002e0c        0x4 src/c/window_scale.c.57.o
  .data.MESSAGE_KEY_ShortcutTrigger
-                0x00002e90        0x4 src/message_keys.auto.c.57.o
-                0x00002e90                MESSAGE_KEY_ShortcutTrigger
+                0x00002e10        0x4 src/message_keys.auto.c.57.o
+                0x00002e10                MESSAGE_KEY_ShortcutTrigger
  .data.MESSAGE_KEY_ShortcutName
-                0x00002e94        0x4 src/message_keys.auto.c.57.o
-                0x00002e94                MESSAGE_KEY_ShortcutName
+                0x00002e14        0x4 src/message_keys.auto.c.57.o
+                0x00002e14                MESSAGE_KEY_ShortcutName
  .data.MESSAGE_KEY_ShortcutIndex
-                0x00002e98        0x4 src/message_keys.auto.c.57.o
-                0x00002e98                MESSAGE_KEY_ShortcutIndex
+                0x00002e18        0x4 src/message_keys.auto.c.57.o
+                0x00002e18                MESSAGE_KEY_ShortcutIndex
  .data.MESSAGE_KEY_ShortcutCount
-                0x00002e9c        0x4 src/message_keys.auto.c.57.o
-                0x00002e9c                MESSAGE_KEY_ShortcutCount
+                0x00002e1c        0x4 src/message_keys.auto.c.57.o
+                0x00002e1c                MESSAGE_KEY_ShortcutCount
  .data.MESSAGE_KEY_ScaleWeight
-                0x00002ea0        0x4 src/message_keys.auto.c.57.o
-                0x00002ea0                MESSAGE_KEY_ScaleWeight
+                0x00002e20        0x4 src/message_keys.auto.c.57.o
+                0x00002e20                MESSAGE_KEY_ScaleWeight
  .data.MESSAGE_KEY_ScaleWater
-                0x00002ea4        0x4 src/message_keys.auto.c.57.o
-                0x00002ea4                MESSAGE_KEY_ScaleWater
+                0x00002e24        0x4 src/message_keys.auto.c.57.o
+                0x00002e24                MESSAGE_KEY_ScaleWater
  .data.MESSAGE_KEY_ScaleMuscle
-                0x00002ea8        0x4 src/message_keys.auto.c.57.o
-                0x00002ea8                MESSAGE_KEY_ScaleMuscle
+                0x00002e28        0x4 src/message_keys.auto.c.57.o
+                0x00002e28                MESSAGE_KEY_ScaleMuscle
  .data.MESSAGE_KEY_ScaleDate
-                0x00002eac        0x4 src/message_keys.auto.c.57.o
-                0x00002eac                MESSAGE_KEY_ScaleDate
+                0x00002e2c        0x4 src/message_keys.auto.c.57.o
+                0x00002e2c                MESSAGE_KEY_ScaleDate
  .data.MESSAGE_KEY_ScaleBodyFat
-                0x00002eb0        0x4 src/message_keys.auto.c.57.o
-                0x00002eb0                MESSAGE_KEY_ScaleBodyFat
+                0x00002e30        0x4 src/message_keys.auto.c.57.o
+                0x00002e30                MESSAGE_KEY_ScaleBodyFat
  .data.MESSAGE_KEY_ScaleBMI
-                0x00002eb4        0x4 src/message_keys.auto.c.57.o
-                0x00002eb4                MESSAGE_KEY_ScaleBMI
+                0x00002e34        0x4 src/message_keys.auto.c.57.o
+                0x00002e34                MESSAGE_KEY_ScaleBMI
  .data.MESSAGE_KEY_DeviceTypeIndex
-                0x00002eb8        0x4 src/message_keys.auto.c.57.o
-                0x00002eb8                MESSAGE_KEY_DeviceTypeIndex
+                0x00002e38        0x4 src/message_keys.auto.c.57.o
+                0x00002e38                MESSAGE_KEY_DeviceTypeIndex
  .data.MESSAGE_KEY_DeviceType
-                0x00002ebc        0x4 src/message_keys.auto.c.57.o
-                0x00002ebc                MESSAGE_KEY_DeviceType
+                0x00002e3c        0x4 src/message_keys.auto.c.57.o
+                0x00002e3c                MESSAGE_KEY_DeviceType
  .data.MESSAGE_KEY_DeviceState
-                0x00002ec0        0x4 src/message_keys.auto.c.57.o
-                0x00002ec0                MESSAGE_KEY_DeviceState
+                0x00002e40        0x4 src/message_keys.auto.c.57.o
+                0x00002e40                MESSAGE_KEY_DeviceState
  .data.MESSAGE_KEY_DeviceOnline
-                0x00002ec4        0x4 src/message_keys.auto.c.57.o
-                0x00002ec4                MESSAGE_KEY_DeviceOnline
+                0x00002e44        0x4 src/message_keys.auto.c.57.o
+                0x00002e44                MESSAGE_KEY_DeviceOnline
  .data.MESSAGE_KEY_DeviceName
-                0x00002ec8        0x4 src/message_keys.auto.c.57.o
-                0x00002ec8                MESSAGE_KEY_DeviceName
+                0x00002e48        0x4 src/message_keys.auto.c.57.o
+                0x00002e48                MESSAGE_KEY_DeviceName
  .data.MESSAGE_KEY_DeviceIndex
-                0x00002ecc        0x4 src/message_keys.auto.c.57.o
-                0x00002ecc                MESSAGE_KEY_DeviceIndex
+                0x00002e4c        0x4 src/message_keys.auto.c.57.o
+                0x00002e4c                MESSAGE_KEY_DeviceIndex
  .data.MESSAGE_KEY_DeviceHasGarage
-                0x00002ed0        0x4 src/message_keys.auto.c.57.o
-                0x00002ed0                MESSAGE_KEY_DeviceHasGarage
+                0x00002e50        0x4 src/message_keys.auto.c.57.o
+                0x00002e50                MESSAGE_KEY_DeviceHasGarage
  .data.MESSAGE_KEY_DeviceCount
-                0x00002ed4        0x4 src/message_keys.auto.c.57.o
-                0x00002ed4                MESSAGE_KEY_DeviceCount
+                0x00002e54        0x4 src/message_keys.auto.c.57.o
+                0x00002e54                MESSAGE_KEY_DeviceCount
  .data.MESSAGE_KEY_CameraWidth
-                0x00002ed8        0x4 src/message_keys.auto.c.57.o
-                0x00002ed8                MESSAGE_KEY_CameraWidth
+                0x00002e58        0x4 src/message_keys.auto.c.57.o
+                0x00002e58                MESSAGE_KEY_CameraWidth
  .data.MESSAGE_KEY_CameraRequest
-                0x00002edc        0x4 src/message_keys.auto.c.57.o
-                0x00002edc                MESSAGE_KEY_CameraRequest
+                0x00002e5c        0x4 src/message_keys.auto.c.57.o
+                0x00002e5c                MESSAGE_KEY_CameraRequest
  .data.MESSAGE_KEY_CameraHeight
-                0x00002ee0        0x4 src/message_keys.auto.c.57.o
-                0x00002ee0                MESSAGE_KEY_CameraHeight
+                0x00002e60        0x4 src/message_keys.auto.c.57.o
+                0x00002e60                MESSAGE_KEY_CameraHeight
  .data.MESSAGE_KEY_CameraEventType
-                0x00002ee4        0x4 src/message_keys.auto.c.57.o
-                0x00002ee4                MESSAGE_KEY_CameraEventType
+                0x00002e64        0x4 src/message_keys.auto.c.57.o
+                0x00002e64                MESSAGE_KEY_CameraEventType
  .data.MESSAGE_KEY_CameraEventTime
-                0x00002ee8        0x4 src/message_keys.auto.c.57.o
-                0x00002ee8                MESSAGE_KEY_CameraEventTime
+                0x00002e68        0x4 src/message_keys.auto.c.57.o
+                0x00002e68                MESSAGE_KEY_CameraEventTime
  .data.MESSAGE_KEY_CameraChunkTotal
-                0x00002eec        0x4 src/message_keys.auto.c.57.o
-                0x00002eec                MESSAGE_KEY_CameraChunkTotal
+                0x00002e6c        0x4 src/message_keys.auto.c.57.o
+                0x00002e6c                MESSAGE_KEY_CameraChunkTotal
  .data.MESSAGE_KEY_CameraChunkIndex
-                0x00002ef0        0x4 src/message_keys.auto.c.57.o
-                0x00002ef0                MESSAGE_KEY_CameraChunkIndex
+                0x00002e70        0x4 src/message_keys.auto.c.57.o
+                0x00002e70                MESSAGE_KEY_CameraChunkIndex
  .data.MESSAGE_KEY_CameraChunkData
-                0x00002ef4        0x4 src/message_keys.auto.c.57.o
-                0x00002ef4                MESSAGE_KEY_CameraChunkData
+                0x00002e74        0x4 src/message_keys.auto.c.57.o
+                0x00002e74                MESSAGE_KEY_CameraChunkData
  .data.MESSAGE_KEY_AuthStatus
-                0x00002ef8        0x4 src/message_keys.auto.c.57.o
-                0x00002ef8                MESSAGE_KEY_AuthStatus
+                0x00002e78        0x4 src/message_keys.auto.c.57.o
+                0x00002e78                MESSAGE_KEY_AuthStatus
  .data.MESSAGE_KEY_AppReady
-                0x00002efc        0x4 src/message_keys.auto.c.57.o
-                0x00002efc                MESSAGE_KEY_AppReady
+                0x00002e7c        0x4 src/message_keys.auto.c.57.o
+                0x00002e7c                MESSAGE_KEY_AppReady
  .data.MESSAGE_KEY_ActionValue
-                0x00002f00        0x4 src/message_keys.auto.c.57.o
-                0x00002f00                MESSAGE_KEY_ActionValue
+                0x00002e80        0x4 src/message_keys.auto.c.57.o
+                0x00002e80                MESSAGE_KEY_ActionValue
  .data.MESSAGE_KEY_ActionType
-                0x00002f04        0x4 src/message_keys.auto.c.57.o
-                0x00002f04                MESSAGE_KEY_ActionType
+                0x00002e84        0x4 src/message_keys.auto.c.57.o
+                0x00002e84                MESSAGE_KEY_ActionType
  .data.MESSAGE_KEY_ActionToggle
-                0x00002f08        0x4 src/message_keys.auto.c.57.o
-                0x00002f08                MESSAGE_KEY_ActionToggle
+                0x00002e88        0x4 src/message_keys.auto.c.57.o
+                0x00002e88                MESSAGE_KEY_ActionToggle
  .data.MESSAGE_KEY_ActionRefresh
-                0x00002f0c        0x4 src/message_keys.auto.c.57.o
-                0x00002f0c                MESSAGE_KEY_ActionRefresh
+                0x00002e8c        0x4 src/message_keys.auto.c.57.o
+                0x00002e8c                MESSAGE_KEY_ActionRefresh
 
-.igot.plt       0x00002f10        0x0
- .igot.plt      0x00002f10        0x0 src/c/WyzeControl.c.57.o
+.igot.plt       0x00002e90        0x0
+ .igot.plt      0x00002e90        0x0 src/c/WyzeControl.c.57.o
 
-.got            0x00002f10       0x98
- .got           0x00002f10       0x98 src/c/WyzeControl.c.57.o
+.got            0x00002e90       0x98
+ .got           0x00002e90       0x98 src/c/WyzeControl.c.57.o
 
-.got.plt        0x00002fa8        0xc
- .got.plt       0x00002fa8        0xc src/c/WyzeControl.c.57.o
-                0x00002fa8                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x00002f28        0xc
+ .got.plt       0x00002f28        0xc src/c/WyzeControl.c.57.o
+                0x00002f28                _GLOBAL_OFFSET_TABLE_
 
-.bss            0x00002fb4     0x136c
+.bss            0x00002f34     0x1368
  *(.bss)
  *(.bss.*)
  .bss.s_image_target
-                0x00002fb4        0x4 src/c/WyzeControl.c.57.o
+                0x00002f34        0x4 src/c/WyzeControl.c.57.o
  .bss.s_auth_state
-                0x00002fb8        0x4 src/c/WyzeControl.c.57.o
-                0x00002fb8                s_auth_state
+                0x00002f38        0x4 src/c/WyzeControl.c.57.o
+                0x00002f38                s_auth_state
  .bss.s_device_count
-                0x00002fbc        0x4 src/c/WyzeControl.c.57.o
-                0x00002fbc                s_device_count
+                0x00002f3c        0x4 src/c/WyzeControl.c.57.o
+                0x00002f3c                s_device_count
  .bss.s_current_type_index
-                0x00002fc0        0x4 src/c/menu_devices.c.57.o
+                0x00002f40        0x4 src/c/menu_devices.c.57.o
  .bss.s_filtered_count
-                0x00002fc4        0x4 src/c/menu_devices.c.57.o
+                0x00002f44        0x4 src/c/menu_devices.c.57.o
  .bss.s_filtered_indices
-                0x00002fc8       0xc8 src/c/menu_devices.c.57.o
+                0x00002f48       0xc8 src/c/menu_devices.c.57.o
  .bss.s_title_layer
-                0x00003090        0x4 src/c/menu_devices.c.57.o
+                0x00003010        0x4 src/c/menu_devices.c.57.o
  .bss.s_menu_layer
-                0x00003094        0x4 src/c/menu_devices.c.57.o
- .bss.s_window  0x00003098        0x4 src/c/menu_devices.c.57.o
+                0x00003014        0x4 src/c/menu_devices.c.57.o
+ .bss.s_window  0x00003018        0x4 src/c/menu_devices.c.57.o
  .bss.s_title_layer
-                0x0000309c        0x4 src/c/menu_light_actions.c.57.o
+                0x0000301c        0x4 src/c/menu_light_actions.c.57.o
  .bss.s_menu_layer
-                0x000030a0        0x4 src/c/menu_light_actions.c.57.o
- .bss.s_window  0x000030a4        0x4 src/c/menu_light_actions.c.57.o
+                0x00003020        0x4 src/c/menu_light_actions.c.57.o
+ .bss.s_window  0x00003024        0x4 src/c/menu_light_actions.c.57.o
  .bss.s_confirm_timer
-                0x000030a8        0x4 src/c/menu_shortcuts.c.57.o
+                0x00003028        0x4 src/c/menu_shortcuts.c.57.o
  .bss.s_confirm_layer
-                0x000030ac        0x4 src/c/menu_shortcuts.c.57.o
+                0x0000302c        0x4 src/c/menu_shortcuts.c.57.o
  .bss.s_title_layer
-                0x000030b0        0x4 src/c/menu_shortcuts.c.57.o
+                0x00003030        0x4 src/c/menu_shortcuts.c.57.o
  .bss.s_menu_layer
-                0x000030b4        0x4 src/c/menu_shortcuts.c.57.o
- .bss.s_window  0x000030b8        0x4 src/c/menu_shortcuts.c.57.o
+                0x00003034        0x4 src/c/menu_shortcuts.c.57.o
+ .bss.s_window  0x00003038        0x4 src/c/menu_shortcuts.c.57.o
  .bss.s_shortcut_count
-                0x000030bc        0x4 src/c/menu_shortcuts.c.57.o
-                0x000030bc                s_shortcut_count
+                0x0000303c        0x4 src/c/menu_shortcuts.c.57.o
+                0x0000303c                s_shortcut_count
  .bss.s_title_layer
-                0x000030c0        0x4 src/c/menu_types.c.57.o
+                0x00003040        0x4 src/c/menu_types.c.57.o
  .bss.s_menu_layer
-                0x000030c4        0x4 src/c/menu_types.c.57.o
- .bss.s_window  0x000030c8        0x4 src/c/menu_types.c.57.o
+                0x00003044        0x4 src/c/menu_types.c.57.o
+ .bss.s_window  0x00003048        0x4 src/c/menu_types.c.57.o
  .bss.s_lock_timer
-                0x000030cc        0x4 src/c/window_actions.c.57.o
+                0x0000304c        0x4 src/c/window_actions.c.57.o
  .bss.s_instruct_layer
-                0x000030d0        0x4 src/c/window_actions.c.57.o
+                0x00003050        0x4 src/c/window_actions.c.57.o
  .bss.s_state_layer
-                0x000030d4        0x4 src/c/window_actions.c.57.o
+                0x00003054        0x4 src/c/window_actions.c.57.o
  .bss.s_name_layer
-                0x000030d8        0x4 src/c/window_actions.c.57.o
+                0x00003058        0x4 src/c/window_actions.c.57.o
  .bss.s_title_layer
-                0x000030dc        0x4 src/c/window_actions.c.57.o
- .bss.s_window  0x000030e0        0x4 src/c/window_actions.c.57.o
+                0x0000305c        0x4 src/c/window_actions.c.57.o
+ .bss.s_window  0x00003060        0x4 src/c/window_actions.c.57.o
  .bss.s_event_time_buf
-                0x000030e4       0x30 src/c/window_camera.c.57.o
+                0x00003064       0x30 src/c/window_camera.c.57.o
  .bss.s_event_type_buf
-                0x00003114       0x30 src/c/window_camera.c.57.o
- .bss.s_status_layer
-                0x00003144        0x4 src/c/window_camera.c.57.o
+                0x00003094       0x30 src/c/window_camera.c.57.o
  .bss.s_event_time_layer
-                0x00003148        0x4 src/c/window_camera.c.57.o
+                0x000030c4        0x4 src/c/window_camera.c.57.o
  .bss.s_event_type_layer
-                0x0000314c        0x4 src/c/window_camera.c.57.o
+                0x000030c8        0x4 src/c/window_camera.c.57.o
  .bss.s_loading_layer
-                0x00003150        0x4 src/c/window_camera.c.57.o
+                0x000030cc        0x4 src/c/window_camera.c.57.o
  .bss.s_name_layer
-                0x00003154        0x4 src/c/window_camera.c.57.o
+                0x000030d0        0x4 src/c/window_camera.c.57.o
  .bss.s_title_layer
-                0x00003158        0x4 src/c/window_camera.c.57.o
- .bss.s_window  0x0000315c        0x4 src/c/window_camera.c.57.o
+                0x000030d4        0x4 src/c/window_camera.c.57.o
+ .bss.s_window  0x000030d8        0x4 src/c/window_camera.c.57.o
  .bss.s_status_layer
-                0x00003160        0x4 src/c/window_garage.c.57.o
+                0x000030dc        0x4 src/c/window_garage.c.57.o
  .bss.s_hint_layer
-                0x00003164        0x4 src/c/window_garage.c.57.o
+                0x000030e0        0x4 src/c/window_garage.c.57.o
  .bss.s_name_layer
-                0x00003168        0x4 src/c/window_garage.c.57.o
+                0x000030e4        0x4 src/c/window_garage.c.57.o
  .bss.s_title_layer
-                0x0000316c        0x4 src/c/window_garage.c.57.o
- .bss.s_window  0x00003170        0x4 src/c/window_garage.c.57.o
+                0x000030e8        0x4 src/c/window_garage.c.57.o
+ .bss.s_window  0x000030ec        0x4 src/c/window_garage.c.57.o
  .bss.s_picker_title
-                0x00003174       0x20 src/c/window_picker.c.57.o
+                0x000030f0       0x20 src/c/window_picker.c.57.o
  .bss.s_callback_context
-                0x00003194        0x4 src/c/window_picker.c.57.o
+                0x00003110        0x4 src/c/window_picker.c.57.o
  .bss.s_callback
-                0x00003198        0x4 src/c/window_picker.c.57.o
+                0x00003114        0x4 src/c/window_picker.c.57.o
  .bss.s_option_count
-                0x0000319c        0x4 src/c/window_picker.c.57.o
+                0x00003118        0x4 src/c/window_picker.c.57.o
  .bss.s_options
-                0x000031a0        0x4 src/c/window_picker.c.57.o
+                0x0000311c        0x4 src/c/window_picker.c.57.o
  .bss.s_title_layer
-                0x000031a4        0x4 src/c/window_picker.c.57.o
+                0x00003120        0x4 src/c/window_picker.c.57.o
  .bss.s_menu_layer
-                0x000031a8        0x4 src/c/window_picker.c.57.o
- .bss.s_window  0x000031ac        0x4 src/c/window_picker.c.57.o
+                0x00003124        0x4 src/c/window_picker.c.57.o
+ .bss.s_window  0x00003128        0x4 src/c/window_picker.c.57.o
  .bss.s_stats_buf
-                0x000031b0       0x80 src/c/window_scale.c.57.o
+                0x0000312c       0x80 src/c/window_scale.c.57.o
  .bss.s_loading_layer
-                0x00003230        0x4 src/c/window_scale.c.57.o
+                0x000031ac        0x4 src/c/window_scale.c.57.o
  .bss.s_stats_layer
-                0x00003234        0x4 src/c/window_scale.c.57.o
+                0x000031b0        0x4 src/c/window_scale.c.57.o
  .bss.s_date_layer
-                0x00003238        0x4 src/c/window_scale.c.57.o
+                0x000031b4        0x4 src/c/window_scale.c.57.o
  .bss.s_weight_layer
-                0x0000323c        0x4 src/c/window_scale.c.57.o
+                0x000031b8        0x4 src/c/window_scale.c.57.o
  .bss.s_title_layer
-                0x00003240        0x4 src/c/window_scale.c.57.o
- .bss.s_window  0x00003244        0x4 src/c/window_scale.c.57.o
- COMMON         0x00003248      0xd48 src/c/WyzeControl.c.57.o
-                0x00003248                s_devices
- COMMON         0x00003f90      0x2d0 src/c/menu_shortcuts.c.57.o
-                0x00003f90                s_shortcuts
- COMMON         0x00004260       0xc0 src/c/window_scale.c.57.o
-                0x00004260                s_scale_data
+                0x000031bc        0x4 src/c/window_scale.c.57.o
+ .bss.s_window  0x000031c0        0x4 src/c/window_scale.c.57.o
+ COMMON         0x000031c4      0xd48 src/c/WyzeControl.c.57.o
+                0x000031c4                s_devices
+ COMMON         0x00003f0c      0x2d0 src/c/menu_shortcuts.c.57.o
+                0x00003f0c                s_shortcuts
+ COMMON         0x000041dc       0xc0 src/c/window_scale.c.57.o
+                0x000041dc                s_scale_data
 
 DISCARD
  libc.a(*)
  libm.a(*)
  libgcc.a(*)
  *(.eh_frame)
-OUTPUT(/Users/jaredwuerzburger/Documents/GitHub/WyzeControl/WyzeControl/build/aplite/pebble-app.elf elf32-littlearm)
+OUTPUT(/Users/jaredwuerzburger/Documents/GitHub/Wyze-Control-for-Pebble/build/aplite/pebble-app.elf elf32-littlearm)
 LOAD linker stubs
 LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a
 LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a
@@ -2332,7 +2329,7 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
  .comment       0x00000038       0x39 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-errno.o)
  .comment       0x00000038       0x39 /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148/toolchain/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/crtend.o
 
-.debug_info     0x00000000     0x8c4b
+.debug_info     0x00000000     0x8bbc
  .debug_info    0x00000000     0x11f0 src/c/WyzeControl.c.57.o
  .debug_info    0x000011f0      0xc52 src/c/menu_devices.c.57.o
  .debug_info    0x00001e42      0xc7c src/c/menu_light_actions.c.57.o
@@ -2340,13 +2337,13 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
  .debug_info    0x00003b62      0xfb6 src/c/menu_types.c.57.o
  .debug_info    0x00004b18      0x456 src/c/title_bar.c.57.o
  .debug_info    0x00004f6e      0xa52 src/c/window_actions.c.57.o
- .debug_info    0x000059c0      0xe26 src/c/window_camera.c.57.o
- .debug_info    0x000067e6      0x98c src/c/window_garage.c.57.o
- .debug_info    0x00007172      0xacf src/c/window_picker.c.57.o
- .debug_info    0x00007c41      0x940 src/c/window_scale.c.57.o
- .debug_info    0x00008581      0x33e aplite/appinfo.auto.c.57.o
- .debug_info    0x000088bf       0x8f aplite/src/resource_ids.auto.c.57.o
- .debug_info    0x0000894e      0x2fd src/message_keys.auto.c.57.o
+ .debug_info    0x000059c0      0xd97 src/c/window_camera.c.57.o
+ .debug_info    0x00006757      0x98c src/c/window_garage.c.57.o
+ .debug_info    0x000070e3      0xacf src/c/window_picker.c.57.o
+ .debug_info    0x00007bb2      0x940 src/c/window_scale.c.57.o
+ .debug_info    0x000084f2      0x33e aplite/appinfo.auto.c.57.o
+ .debug_info    0x00008830       0x8f aplite/src/resource_ids.auto.c.57.o
+ .debug_info    0x000088bf      0x2fd src/message_keys.auto.c.57.o
 
 .debug_abbrev   0x00000000     0x20a9
  .debug_abbrev  0x00000000      0x364 src/c/WyzeControl.c.57.o
@@ -2444,21 +2441,21 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
  .debug_rnglists
                 0x00000339       0x33 src/c/window_scale.c.57.o
 
-.debug_line     0x00000000     0x403a
- .debug_line    0x00000000      0x867 src/c/WyzeControl.c.57.o
- .debug_line    0x00000867      0x67f src/c/menu_devices.c.57.o
- .debug_line    0x00000ee6      0x53c src/c/menu_light_actions.c.57.o
- .debug_line    0x00001422      0x508 src/c/menu_shortcuts.c.57.o
- .debug_line    0x0000192a      0x67b src/c/menu_types.c.57.o
- .debug_line    0x00001fa5      0x21b src/c/title_bar.c.57.o
- .debug_line    0x000021c0      0x52f src/c/window_actions.c.57.o
- .debug_line    0x000026ef      0x632 src/c/window_camera.c.57.o
- .debug_line    0x00002d21      0x52d src/c/window_garage.c.57.o
- .debug_line    0x0000324e      0x465 src/c/window_picker.c.57.o
- .debug_line    0x000036b3      0x4fc src/c/window_scale.c.57.o
- .debug_line    0x00003baf      0x1d2 aplite/appinfo.auto.c.57.o
- .debug_line    0x00003d81      0x160 aplite/src/resource_ids.auto.c.57.o
- .debug_line    0x00003ee1      0x159 src/message_keys.auto.c.57.o
+.debug_line     0x00000000     0x3fbc
+ .debug_line    0x00000000      0x864 src/c/WyzeControl.c.57.o
+ .debug_line    0x00000864      0x67c src/c/menu_devices.c.57.o
+ .debug_line    0x00000ee0      0x539 src/c/menu_light_actions.c.57.o
+ .debug_line    0x00001419      0x505 src/c/menu_shortcuts.c.57.o
+ .debug_line    0x0000191e      0x678 src/c/menu_types.c.57.o
+ .debug_line    0x00001f96      0x218 src/c/title_bar.c.57.o
+ .debug_line    0x000021ae      0x52c src/c/window_actions.c.57.o
+ .debug_line    0x000026da      0x5d5 src/c/window_camera.c.57.o
+ .debug_line    0x00002caf      0x52a src/c/window_garage.c.57.o
+ .debug_line    0x000031d9      0x462 src/c/window_picker.c.57.o
+ .debug_line    0x0000363b      0x4f9 src/c/window_scale.c.57.o
+ .debug_line    0x00003b34      0x1cf aplite/appinfo.auto.c.57.o
+ .debug_line    0x00003d03      0x160 aplite/src/resource_ids.auto.c.57.o
+ .debug_line    0x00003e63      0x159 src/message_keys.auto.c.57.o
 
 .debug_str      0x00000000     0x1dee
  .debug_str     0x00000000     0x1dee src/c/WyzeControl.c.57.o
@@ -2469,7 +2466,7 @@ LOAD /Users/jaredwuerzburger/Library/Application Support/Pebble SDK/SDKs/4.9.148
  .debug_str     0x00001dee      0xa32 src/c/menu_types.c.57.o
  .debug_str     0x00001dee      0x35d src/c/title_bar.c.57.o
  .debug_str     0x00001dee      0x678 src/c/window_actions.c.57.o
- .debug_str     0x00001dee      0x94a src/c/window_camera.c.57.o
+ .debug_str     0x00001dee      0x93b src/c/window_camera.c.57.o
  .debug_str     0x00001dee      0x62f src/c/window_garage.c.57.o
  .debug_str     0x00001dee      0x7a0 src/c/window_picker.c.57.o
  .debug_str     0x00001dee      0x520 src/c/window_scale.c.57.o

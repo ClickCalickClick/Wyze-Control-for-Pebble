@@ -7,7 +7,6 @@ static TextLayer *s_name_layer;
 static TextLayer *s_loading_layer;
 static TextLayer *s_event_type_layer;
 static TextLayer *s_event_time_layer;
-static TextLayer *s_status_layer;
 
 #ifdef PBL_COLOR
 static BitmapLayer *s_bitmap_layer;
@@ -88,12 +87,6 @@ static void window_load(Window *window) {
   text_layer_set_text_alignment(s_event_time_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_event_time_layer));
 
-  // Status / hint
-  s_status_layer = text_layer_create(GRect(5, bounds.size.h - 22, bounds.size.w - 10, 20));
-  text_layer_set_text(s_status_layer, "Latest Event");
-  text_layer_set_font(s_status_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
-  text_layer_set_text_alignment(s_status_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_status_layer));
 }
 
 static void window_appear(Window *window) {
@@ -133,8 +126,6 @@ static void window_unload(Window *window) {
   s_event_type_layer = NULL;
   text_layer_destroy(s_event_time_layer);
   s_event_time_layer = NULL;
-  text_layer_destroy(s_status_layer);
-  s_status_layer = NULL;
 }
 
 void window_camera_receive_event(const char *event_type, const char *event_time) {
