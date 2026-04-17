@@ -1,0 +1,59 @@
+{
+  "name": "wyze-api",
+  "version": "1.1.7",
+  "description": "An unoficial API wrapper for Wyze products.",
+  "homepage": "https://github.com/jfarmer08/wyze-api",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wyze",
+    "wyze-api",
+    "api",
+    "node",
+    "sensors",
+    "wyzecam",
+    "wyze-node",
+    "wyze bulbs",
+    "wyze sense"
+  ],
+  "author": "Allen Farmer",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "1.5.0",
+    "moment": "2.29.4",
+    "urllib": "3.18.0",
+    "crypto-js": "4.1.1",
+    "utf8": "3.0.0",
+    "colorsys": "^1.0.22",
+    "base64-js": "1.5.1",
+    "querystring": "0.2.1",
+    "uuid-by-string": "4.0.0",
+    "@ptkdev/logger": "1.8.0"
+  },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/AllenFarmer"
+    },
+    {
+      "type": "venmo",
+      "url": "https://venmo.com/u/Allen-Farmer"
+    },
+    {
+      "type": "cashApp",
+      "url": "https://cash.app/$Jfamer08"
+    }
+  ],
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jfarmer08/wyze-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jfarmer08/wyze-api/issues"
+  }
+}
