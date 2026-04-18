@@ -1,7 +1,7 @@
 const https = require('https');
 
-const KEY_ID = 'REDACTED_WYZE_KEY_ID';
-const API_KEY = 'REDACTED_API_KEY'; // Or exactly what user provided
+const KEY_ID = process.env.WYZE_KEY_ID || 'YOUR_KEY_ID';
+const API_KEY = process.env.WYZE_API_KEY || 'YOUR_API_KEY';
 
 const postOptions = {
   hostname: 'auth-prod.api.wyze.com',

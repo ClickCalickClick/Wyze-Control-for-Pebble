@@ -1285,13 +1285,13 @@
 	    fetchDevices();
 	  } else if (d.ActionLogout !== undefined) {
 	    wyzeLogout();
-	  /* TEST AUTH — uncommented for testing, see test_menu_instructions.md to re-disable
+	  /* TEST AUTH — uncomment for testing, see test_menu_instructions.md to re-disable
 	  } else if (d.TestAuth !== undefined) {
 	    console.log('TEST AUTH: injecting test credentials (in-memory only)');
-	    SETTINGS.WyzeEmail = 'REDACTED_EMAIL';
-	    SETTINGS.WyzeAPIKey = 'REDACTED_WYZE_API_KEY';
-	    SETTINGS.WyzeKeyID = 'REDACTED_WYZE_KEY_ID';
-	    authenticateWyze('REDACTED_PASSWORD', function() {
+	    SETTINGS.WyzeEmail = 'YOUR_EMAIL@example.com';
+	    SETTINGS.WyzeAPIKey = 'YOUR_WYZE_API_KEY';
+	    SETTINGS.WyzeKeyID = 'YOUR_WYZE_KEY_ID';
+	    authenticateWyze('YOUR_PASSWORD', function() {
 	      sendAuthStatusToWatch(1);
 	      fetchDevices();
 	      fetchShortcuts();
