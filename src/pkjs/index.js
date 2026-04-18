@@ -901,6 +901,114 @@ function tryImageDownload(dlUrl, onFail) {
   req.send();
 }
 
+// Atkinson dither: RGBA source → 1-bit packed for GBitmapFormat1Bit
+// Uses area-average downscaling, contrast stretch, unsharp mask, and Atkinson dithering.
+// Output: Uint8Array with rows padded to 4-byte boundary (GBitmapFormat1Bit requirement).
+// Bit packing: LSB-first (bit 0 = leftmost pixel) per the Pebble SDK bitmapgen.py.
+// Packed as bytes within little-endian 32-bit words. 1 = white, 0 = black.
+function ditherTo1Bit(rgba, srcW, srcH, dstW, dstH) {
+  // Step 1: Area-average downscale to grayscale
+  var gray = new Float32Array(dstW * dstH);
+  var xRatio = srcW / dstW;
+  var yRatio = srcH / dstH;
+  for (var dy = 0; dy < dstH; dy++) {
+    var sy0 = Math.floor(dy * yRatio);
+    var sy1 = Math.min(Math.ceil((dy + 1) * yRatio), srcH);
+    for (var dx = 0; dx < dstW; dx++) {
+      var sx0 = Math.floor(dx * xRatio);
+      var sx1 = Math.min(Math.ceil((dx + 1) * xRatio), srcW);
+      var sum = 0, count = 0;
+      for (var sy = sy0; sy < sy1; sy++) {
+        var rowOff = sy * srcW;
+        for (var sx = sx0; sx < sx1; sx++) {
+          var si = (rowOff + sx) * 4;
+          sum += 0.299 * rgba[si] + 0.587 * rgba[si + 1] + 0.114 * rgba[si + 2];
+          count++;
+        }
+      }
+      gray[dy * dstW + dx] = count > 0 ? sum / count : 0;
+    }
+  }
+
+  // Step 2: Contrast stretch — expand dynamic range before dithering
+  var hist = new Uint32Array(256);
+  for (var i = 0; i < gray.length; i++) hist[Math.min(255, Math.max(0, Math.round(gray[i])))]++;
+  var total = gray.length;
+  var clipLo = total * 0.02, clipHi = total * 0.98;
+  var cumLo = 0;
+  var lo = 0, hi = 255;
+  for (var v = 0; v < 256; v++) {
+    cumLo += hist[v];
+    if (cumLo >= clipLo) { lo = v; break; }
+  }
+  var cumHi = 0;
+  for (var v = 255; v >= 0; v--) {
+    cumHi += hist[v];
+    if (cumHi >= (total - clipHi)) { hi = v; break; }
+  }
+  if (hi > lo) {
+    var scale = 255.0 / (hi - lo);
+    for (var i = 0; i < gray.length; i++) {
+      var v = (gray[i] - lo) * scale;
+      gray[i] = v < 0 ? 0 : (v > 255 ? 255 : v);
+    }
+  }
+
+  // Step 3: Unsharp mask — sharpen edges before dithering for crisper 1-bit output
+  // blur = 3×3 box blur, then sharpened = original + amount * (original - blur)
+  var amount = 1.5;
+  var sharp = new Float32Array(dstW * dstH);
+  for (var y = 0; y < dstH; y++) {
+    for (var x = 0; x < dstW; x++) {
+      var sum = 0, cnt = 0;
+      for (var ky = -1; ky <= 1; ky++) {
+        var ny = y + ky;
+        if (ny < 0 || ny >= dstH) continue;
+        for (var kx = -1; kx <= 1; kx++) {
+          var nx = x + kx;
+          if (nx < 0 || nx >= dstW) continue;
+          sum += gray[ny * dstW + nx];
+          cnt++;
+        }
+      }
+      var blur = sum / cnt;
+      var orig = gray[y * dstW + x];
+      var v = orig + amount * (orig - blur);
+      sharp[y * dstW + x] = v < 0 ? 0 : (v > 255 ? 255 : v);
+    }
+  }
+
+  // Step 4: Atkinson dithering with LSB-first bit packing
+  // Pebble GBitmapFormat1Bit: bit 0 of byte = leftmost pixel (LSB-first),
+  // rows padded to 4-byte (32-bit word) boundaries, little-endian.
+  var rowBytes = Math.ceil(dstW / 32) * 4;
+  var packed = new Uint8Array(rowBytes * dstH);
+
+  for (var y = 0; y < dstH; y++) {
+    for (var x = 0; x < dstW; x++) {
+      var idx = y * dstW + x;
+      var oldVal = sharp[idx];
+      var newVal = oldVal >= 128 ? 255 : 0;
+      var err = (oldVal - newVal) / 8;
+
+      // Pack bit: 1 = white, 0 = black. LSB-first: pixel x → bit (x % 8).
+      if (newVal > 0) {
+        packed[y * rowBytes + Math.floor(x / 8)] |= (1 << (x % 8));
+      }
+
+      // Atkinson: diffuse 1/8 to each of 6 neighbors (total 6/8, 2/8 lost)
+      if (x + 1 < dstW)                   sharp[idx + 1]          += err;
+      if (x + 2 < dstW)                   sharp[idx + 2]          += err;
+      if (y + 1 < dstH && x > 0)          sharp[idx + dstW - 1]   += err;
+      if (y + 1 < dstH)                   sharp[idx + dstW]       += err;
+      if (y + 1 < dstH && x + 1 < dstW)  sharp[idx + dstW + 1]   += err;
+      if (y + 2 < dstH)                   sharp[idx + 2 * dstW]   += err;
+    }
+  }
+
+  return packed;
+}
+
 function processJpegResponse(jpegData) {
   console.log('Image downloaded: ' + jpegData.length + ' bytes');
   // Debug: check JPEG header bytes
@@ -915,23 +1023,39 @@ function processJpegResponse(jpegData) {
     var rgba = decoded.data;
     console.log('JPEG decoded: ' + srcW + 'x' + srcH);
 
-    // Resize to Pebble target size using nearest-neighbor
-    var pebbleData = new Uint8Array(CAM_TARGET_W * CAM_TARGET_H);
-    for (var y = 0; y < CAM_TARGET_H; y++) {
-      var srcY = Math.floor(y * srcH / CAM_TARGET_H);
-      for (var x = 0; x < CAM_TARGET_W; x++) {
-        var srcX = Math.floor(x * srcW / CAM_TARGET_W);
-        var si = (srcY * srcW + srcX) * 4;
-        var r = rgba[si];
-        var g = rgba[si + 1];
-        var b = rgba[si + 2];
-        // Convert to Pebble 8-bit color: 0b11RRGGBB
-        pebbleData[y * CAM_TARGET_W + x] = 0xC0 | ((r >> 6) << 4) | ((g >> 6) << 2) | (b >> 6);
-      }
+    // Detect B&W platform
+    var isBW = false;
+    if (Pebble.getActiveWatchInfo) {
+      var platform = Pebble.getActiveWatchInfo().platform;
+      isBW = (platform === 'aplite' || platform === 'diorite' || platform === 'flint');
+      console.log('Platform: ' + platform + ', isBW: ' + isBW);
     }
-    console.log('Pebble 8-bit: ' + pebbleData.length + ' bytes');
-    var totalChunks = Math.ceil(pebbleData.length / CAM_CHUNK_SIZE);
-    sendImageChunk(pebbleData, 0, totalChunks, CAM_TARGET_W, CAM_TARGET_H);
+
+    if (isBW) {
+      // B&W: Floyd-Steinberg dither to 1-bit, packed for GBitmapFormat1Bit
+      var pebbleData = ditherTo1Bit(rgba, srcW, srcH, CAM_TARGET_W, CAM_TARGET_H);
+      console.log('Pebble 1-bit: ' + pebbleData.length + ' bytes');
+      var totalChunks = Math.ceil(pebbleData.length / CAM_CHUNK_SIZE);
+      sendImageChunk(pebbleData, 0, totalChunks, CAM_TARGET_W, CAM_TARGET_H);
+    } else {
+      // Color: existing 8-bit conversion
+      var pebbleData = new Uint8Array(CAM_TARGET_W * CAM_TARGET_H);
+      for (var y = 0; y < CAM_TARGET_H; y++) {
+        var srcY = Math.floor(y * srcH / CAM_TARGET_H);
+        for (var x = 0; x < CAM_TARGET_W; x++) {
+          var srcX = Math.floor(x * srcW / CAM_TARGET_W);
+          var si = (srcY * srcW + srcX) * 4;
+          var r = rgba[si];
+          var g = rgba[si + 1];
+          var b = rgba[si + 2];
+          // Convert to Pebble 8-bit color: 0b11RRGGBB
+          pebbleData[y * CAM_TARGET_W + x] = 0xC0 | ((r >> 6) << 4) | ((g >> 6) << 2) | (b >> 6);
+        }
+      }
+      console.log('Pebble 8-bit: ' + pebbleData.length + ' bytes');
+      var totalChunks = Math.ceil(pebbleData.length / CAM_CHUNK_SIZE);
+      sendImageChunk(pebbleData, 0, totalChunks, CAM_TARGET_W, CAM_TARGET_H);
+    }
   } catch (e) {
     console.log('JPEG decode error: ' + e);
   }
@@ -1065,7 +1189,7 @@ Pebble.addEventListener('appmessage', function(e) {
     fetchDevices();
   } else if (d.ActionLogout !== undefined) {
     wyzeLogout();
-  /* TEST AUTH — commented out, see test_menu_instructions.md to re-enable
+  /* TEST AUTH — uncommented for testing, see test_menu_instructions.md to re-disable
   } else if (d.TestAuth !== undefined) {
     console.log('TEST AUTH: injecting test credentials (in-memory only)');
     SETTINGS.WyzeEmail = 'jwuerz@gmail.com';

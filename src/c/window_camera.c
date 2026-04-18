@@ -19,6 +19,17 @@ static int s_chunks_received;
 static int s_chunks_total;
 #endif
 
+#ifdef PBL_BW
+static BitmapLayer *s_bw_bitmap_layer;
+static GBitmap *s_bw_bitmap;
+static uint8_t *s_bw_img_buffer;
+static int s_bw_img_width;
+static int s_bw_img_height;
+static int s_bw_img_total_bytes;
+static int s_bw_chunks_received;
+static int s_bw_chunks_total;
+#endif
+
 static int s_device_index = -1;
 static char s_event_type_buf[48];
 static char s_event_time_buf[48];
@@ -39,6 +50,24 @@ static void free_image(void) {
   s_img_total_bytes = 0;
   s_chunks_received = 0;
   s_chunks_total = 0;
+}
+#endif
+
+#ifdef PBL_BW
+static void free_bw_image(void) {
+  if (s_bw_bitmap) {
+    gbitmap_destroy(s_bw_bitmap);
+    s_bw_bitmap = NULL;
+  }
+  if (s_bw_img_buffer) {
+    free(s_bw_img_buffer);
+    s_bw_img_buffer = NULL;
+  }
+  s_bw_img_width = 0;
+  s_bw_img_height = 0;
+  s_bw_img_total_bytes = 0;
+  s_bw_chunks_received = 0;
+  s_bw_chunks_total = 0;
 }
 #endif
 
@@ -65,7 +94,13 @@ static void window_load(Window *window) {
   layer_add_child(window_layer, bitmap_layer_get_layer(s_bitmap_layer));
   int text_y = img_y + 84;
 #else
-  int text_y = y + 25;
+  // B&W: Bitmap layer for dithered camera thumbnail
+  int img_y = y + 22;
+  s_bw_bitmap_layer = bitmap_layer_create(GRect(0, img_y, bounds.size.w, 84));
+  bitmap_layer_set_compositing_mode(s_bw_bitmap_layer, GCompOpAssign);
+  bitmap_layer_set_alignment(s_bw_bitmap_layer, GAlignCenter);
+  layer_add_child(window_layer, bitmap_layer_get_layer(s_bw_bitmap_layer));
+  int text_y = img_y + 84;
 #endif
 
   // Loading indicator
@@ -114,6 +149,13 @@ static void window_unload(Window *window) {
   if (s_bitmap_layer) {
     bitmap_layer_destroy(s_bitmap_layer);
     s_bitmap_layer = NULL;
+  }
+#endif
+#ifdef PBL_BW
+  free_bw_image();
+  if (s_bw_bitmap_layer) {
+    bitmap_layer_destroy(s_bw_bitmap_layer);
+    s_bw_bitmap_layer = NULL;
   }
 #endif
   text_layer_destroy(s_title_layer);
@@ -206,8 +248,67 @@ void window_camera_receive_chunk(int chunk_index, int chunk_total, uint8_t *data
     s_img_buffer = NULL;
   }
 #else
-  // B&W platforms: no image support
-  (void)chunk_index; (void)chunk_total; (void)data; (void)data_len; (void)width; (void)height;
+  // B&W platforms: 1-bit dithered image support
+  if (chunk_index == 0) {
+    free_bw_image();
+    s_bw_img_width = width;
+    s_bw_img_height = height;
+    // 1-bit packed: row_bytes = ceil(width/8), padded to 4-byte boundary
+    int row_bytes = (width + 31) / 32 * 4;
+    s_bw_img_total_bytes = row_bytes * height;
+    s_bw_chunks_total = chunk_total;
+    s_bw_chunks_received = 0;
+    s_bw_img_buffer = (uint8_t *)malloc(s_bw_img_total_bytes);
+    if (!s_bw_img_buffer) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Camera BW: failed to malloc %d bytes", s_bw_img_total_bytes);
+      if (s_loading_layer) text_layer_set_text(s_loading_layer, "Memory error");
+      return;
+    }
+    memset(s_bw_img_buffer, 0, s_bw_img_total_bytes);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Camera BW: alloc %dx%d (%d bytes), %d chunks", width, height, s_bw_img_total_bytes, chunk_total);
+  }
+
+  if (!s_bw_img_buffer) return;
+
+  // Copy chunk data into buffer
+  int offset = chunk_index * 1500;  // Must match JS CAM_CHUNK_SIZE
+  int copy_len = data_len;
+  if (offset + copy_len > s_bw_img_total_bytes) {
+    copy_len = s_bw_img_total_bytes - offset;
+  }
+  if (copy_len > 0) {
+    memcpy(&s_bw_img_buffer[offset], data, copy_len);
+  }
+  s_bw_chunks_received++;
+
+  // Update loading text with progress
+  snprintf(s_loading_buf, sizeof(s_loading_buf), "Image %d/%d", s_bw_chunks_received, s_bw_chunks_total);
+  if (s_loading_layer) text_layer_set_text(s_loading_layer, s_loading_buf);
+
+  // Final chunk: create GBitmap and display
+  if (s_bw_chunks_received >= s_bw_chunks_total) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Camera BW: all %d chunks received, creating bitmap", s_bw_chunks_total);
+    s_bw_bitmap = gbitmap_create_blank(GSize(s_bw_img_width, s_bw_img_height), GBitmapFormat1Bit);
+    if (s_bw_bitmap) {
+      uint8_t *bitmap_data = gbitmap_get_data(s_bw_bitmap);
+      int bmp_row_bytes = gbitmap_get_bytes_per_row(s_bw_bitmap);
+      int src_row_bytes = (s_bw_img_width + 31) / 32 * 4;
+      for (int y = 0; y < s_bw_img_height; y++) {
+        memcpy(&bitmap_data[y * bmp_row_bytes], &s_bw_img_buffer[y * src_row_bytes], src_row_bytes);
+      }
+      if (s_bw_bitmap_layer) {
+        bitmap_layer_set_bitmap(s_bw_bitmap_layer, s_bw_bitmap);
+        layer_mark_dirty(bitmap_layer_get_layer(s_bw_bitmap_layer));
+      }
+      if (s_loading_layer) text_layer_set_text(s_loading_layer, "");
+      APP_LOG(APP_LOG_LEVEL_INFO, "Camera BW: bitmap displayed");
+    } else {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Camera BW: gbitmap_create_blank failed");
+      if (s_loading_layer) text_layer_set_text(s_loading_layer, "Image error");
+    }
+    free(s_bw_img_buffer);
+    s_bw_img_buffer = NULL;
+  }
 #endif
 }
 

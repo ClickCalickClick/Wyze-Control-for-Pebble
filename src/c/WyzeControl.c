@@ -189,14 +189,15 @@ void wyze_data_request_refresh(void) {
   app_message_outbox_send();
 }
 
-/* TEST auth — commented out, see test_menu_instructions.md to re-enable
+/* TEST auth — uncommented for testing, see test_menu_instructions.md to re-disable
 void wyze_data_test_auth(void) {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   if (!iter) return;
   dict_write_uint8(iter, MESSAGE_KEY_TestAuth, 1);
   app_message_outbox_send();
-} */
+}
+*/
 
 int main(void) {
   wyze_app_message_init();

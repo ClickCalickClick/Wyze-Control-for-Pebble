@@ -31,7 +31,7 @@ void wyze_data_set_property(int device_id, int action_type, int action_value);
 
 void menu_types_window_push(void);
 void menu_types_reload_data(void);
-// void wyze_data_test_auth(void);  // TEST menu — commented out
+// void wyze_data_test_auth(void);  // TEST menu — uncommented for testing
 void menu_devices_window_push(int type_index);
 void menu_devices_reload_data(void);
 void window_device_action_push(int device_index);

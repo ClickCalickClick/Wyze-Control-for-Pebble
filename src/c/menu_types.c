@@ -35,7 +35,7 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
     return;
   }
 
-  /* TEST row — commented out, see test_menu_instructions.md to re-enable
+  /* TEST row — uncommented for testing, see test_menu_instructions.md to re-disable
   if (target_type == -99) {
     char buf[32];
     if (s_auth_state >= 2 && s_device_count > 0) {
@@ -47,7 +47,8 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
     }
     menu_cell_basic_draw(ctx, cell_layer, s_type_names[cell_index->row], buf, NULL);
     return;
-  } */
+  }
+  */
 
   int count = 0;
   for(int i = 0; i < s_device_count; i++) {
@@ -78,13 +79,14 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     menu_shortcuts_window_push();
     return;
   }
-  /* TEST: inject test credentials — commented out, see test_menu_instructions.md
+  /* TEST: inject test credentials — uncommented for testing, see test_menu_instructions.md
   if (target_type == -99) {
     s_auth_state = 1;
     menu_layer_reload_data(s_menu_layer);
     wyze_data_test_auth();
     return;
-  } */
+  }
+  */
   // Auto-refresh device data silently when entering a category
   wyze_data_request_refresh();
   // Push device list of this category
