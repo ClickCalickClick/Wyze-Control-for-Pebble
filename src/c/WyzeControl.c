@@ -62,6 +62,44 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
     return;
   }
 
+  // Vacuum status from JS
+  Tuple *vac_bat_t = dict_find(iter, MESSAGE_KEY_VacuumBattery);
+  if (vac_bat_t) {
+    s_vacuum_data.battery = vac_bat_t->value->int32;
+    Tuple *t;
+    t = dict_find(iter, MESSAGE_KEY_VacuumMode);
+    if (t) s_vacuum_data.mode = t->value->int32;
+    t = dict_find(iter, MESSAGE_KEY_VacuumModeText);
+    if (t) strncpy(s_vacuum_data.mode_text, t->value->cstring, sizeof(s_vacuum_data.mode_text) - 1);
+    t = dict_find(iter, MESSAGE_KEY_DeviceOnline);
+    if (t) s_vacuum_data.online = t->value->int32;
+    window_vacuum_refresh();
+    return;
+  }
+
+  // Thermostat status from JS
+  Tuple *th_temp_t = dict_find(iter, MESSAGE_KEY_ThermoTemp);
+  if (th_temp_t) {
+    s_thermo_data.temp_x10 = th_temp_t->value->int32;
+    Tuple *t;
+    t = dict_find(iter, MESSAGE_KEY_ThermoHumidity);
+    if (t) s_thermo_data.humidity = t->value->int32;
+    t = dict_find(iter, MESSAGE_KEY_ThermoMode);
+    if (t) strncpy(s_thermo_data.mode, t->value->cstring, sizeof(s_thermo_data.mode) - 1);
+    t = dict_find(iter, MESSAGE_KEY_ThermoHeatSP);
+    if (t) s_thermo_data.heat_sp = t->value->int32;
+    t = dict_find(iter, MESSAGE_KEY_ThermoCoolSP);
+    if (t) s_thermo_data.cool_sp = t->value->int32;
+    t = dict_find(iter, MESSAGE_KEY_ThermoFan);
+    if (t) strncpy(s_thermo_data.fan, t->value->cstring, sizeof(s_thermo_data.fan) - 1);
+    t = dict_find(iter, MESSAGE_KEY_ThermoWorking);
+    if (t) strncpy(s_thermo_data.working, t->value->cstring, sizeof(s_thermo_data.working) - 1);
+    t = dict_find(iter, MESSAGE_KEY_DeviceOnline);
+    if (t) s_thermo_data.online = t->value->int32;
+    window_thermostat_refresh();
+    return;
+  }
+
   // Scale data from JS
   Tuple *scale_w = dict_find(iter, MESSAGE_KEY_ScaleWeight);
   if (scale_w) {
@@ -98,6 +136,18 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
       } else {
         window_camera_receive_chunk(chunk_idx, total, data_t->value->data, data_t->length, width, height);
       }
+    }
+    return;
+  }
+
+  // Camera progress from JS — route to camera or garage window
+  Tuple *cam_progress_t = dict_find(iter, MESSAGE_KEY_CameraProgress);
+  if (cam_progress_t) {
+    int percent = cam_progress_t->value->int32;
+    if (s_image_target == 1) {
+      window_garage_receive_progress(percent);
+    } else {
+      window_camera_receive_progress(percent);
     }
     return;
   }

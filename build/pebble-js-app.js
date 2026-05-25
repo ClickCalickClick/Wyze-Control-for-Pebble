@@ -118,8 +118,23 @@
 	var WYZE_CAM_APP_VERSION = '2.50.6.9';
 	var WYZE_CAM_USER_AGENT = 'Wyze/2.50.6.9 (iPhone; iOS 17.0; Scale/3.00)';
 	var CAM_CHUNK_SIZE = 1500;
-	var CAM_TARGET_W = 144;
-	var CAM_TARGET_H = 84;
+	var CAM_TARGET_W_DEFAULT = 144;
+	var CAM_TARGET_H_DEFAULT = 84;
+	var CAM_PROGRESS_EVENT_END = 20;
+	var CAM_PROGRESS_DOWNLOAD_END = 65;
+	var CAM_PROGRESS_PROCESS_END = 85;
+	var CAM_PROGRESS_TRANSFER_END = 99;
+	var CAM_PROGRESS_EMIT_THROTTLE_MS = 160;
+	
+	var s_cameraProgress = {
+	  requestId: 0,
+	  lastPercent: -1,
+	  lastEmitTs: 0
+	};
+	
+	var REFRESH_RETRY_MAX = 3;
+	var REFRESH_RETRY_BASE_MS = 2000;
+	var s_refresh_retry_attempts = 0;
 	
 	var jpegDecode = __webpack_require__(8).decode;
 	
@@ -202,6 +217,100 @@
 	  SETTINGS = parsed;
 	}
 	
+	function isAutoReauthEnabled() {
+	  return SETTINGS.WyzeAutoReauth === true || SETTINGS.WyzeAutoReauth === 1 || SETTINGS.WyzeAutoReauth === '1';
+	}
+	
+	function hasSavedReauthHash() {
+	  return !!(SETTINGS.WyzeEmail && SETTINGS.WyzePasswordHash && isAutoReauthEnabled());
+	}
+	
+	function clearAuthTokens() {
+	  localStorage.removeItem('wyze_access_token');
+	  localStorage.removeItem('wyze_refresh_token');
+	  wyzeToken = null;
+	}
+	
+	function isHardRefreshFailure(statusCode, responseJson) {
+	  if (statusCode === 401 || statusCode === 403) return true;
+	  if (!responseJson) return false;
+	
+	  var code = responseJson.code;
+	  if (code === 2001 || code === 2002 || code === 3001) return true;
+	
+	  var msg = String(responseJson.msg || responseJson.description || '').toLowerCase();
+	  return msg.indexOf('invalid token') >= 0 ||
+	    msg.indexOf('token expired') >= 0 ||
+	    msg.indexOf('refresh token') >= 0 ||
+	    msg.indexOf('unauthorized') >= 0;
+	}
+	
+	function getCameraTargetSize() {
+	  var platform = null;
+	  if (Pebble.getActiveWatchInfo) {
+	    try {
+	      platform = Pebble.getActiveWatchInfo().platform;
+	    } catch (e) {
+	      platform = null;
+	    }
+	  }
+	
+	  if (platform === 'emery') {
+	    return { width: 200, height: 132 };
+	  }
+	  if (platform === 'gabbro') {
+	    return { width: 164, height: 96 };
+	  }
+	  return { width: CAM_TARGET_W_DEFAULT, height: CAM_TARGET_H_DEFAULT };
+	}
+	
+	function isCameraProgressActive(requestId) {
+	  return requestId === s_cameraProgress.requestId;
+	}
+	
+	function clampPercent(percent) {
+	  if (percent < 0) return 0;
+	  if (percent > 100) return 100;
+	  return percent;
+	}
+	
+	function toStagePercent(start, end, fraction) {
+	  var safeFraction = fraction;
+	  if (safeFraction < 0) safeFraction = 0;
+	  if (safeFraction > 1) safeFraction = 1;
+	  return Math.floor(start + ((end - start) * safeFraction));
+	}
+	
+	function emitCameraProgress(requestId, percent, force) {
+	  if (!isCameraProgressActive(requestId)) return;
+	  var clamped = clampPercent(percent);
+	  if (clamped < s_cameraProgress.lastPercent) {
+	    clamped = s_cameraProgress.lastPercent;
+	  }
+	
+	  var now = Date.now();
+	  if (!force) {
+	    if (clamped === s_cameraProgress.lastPercent) return;
+	    if ((now - s_cameraProgress.lastEmitTs) < CAM_PROGRESS_EMIT_THROTTLE_MS && clamped < 100) return;
+	  }
+	
+	  s_cameraProgress.lastPercent = clamped;
+	  s_cameraProgress.lastEmitTs = now;
+	  Pebble.sendAppMessage({ "CameraProgress": clamped }, null, function() {});
+	}
+	
+	function emitCameraStageProgress(requestId, start, end, fraction, force) {
+	  emitCameraProgress(requestId, toStagePercent(start, end, fraction), force);
+	}
+	
+	function beginCameraProgressRequest() {
+	  s_cameraProgress.requestId += 1;
+	  s_cameraProgress.lastPercent = -1;
+	  s_cameraProgress.lastEmitTs = 0;
+	  emitCameraProgress(s_cameraProgress.requestId, 0, true);
+	  return s_cameraProgress.requestId;
+	}
+	
 	// ------------------------------------------------------------------
 	// Security: Token Exchange & Forget Pattern
 	// 1. Sends raw password once to get long-lasting auth tokens.
@@ -235,12 +344,22 @@
 	  }
 	  
 	  var cachedAccessToken = localStorage.getItem('wyze_access_token');
+	  var shouldUseSavedHash = !rawPassword && !cachedAccessToken && hasSavedReauthHash();
+	  var hashedPassword = null;
+	  if (rawPassword) {
+	    hashedPassword = md5(md5(md5(rawPassword)));
+	  } else if (shouldUseSavedHash) {
+	    hashedPassword = SETTINGS.WyzePasswordHash;
+	  }
 	  
-	  if (SETTINGS.WyzeEmail && rawPassword) {
+	  if (SETTINGS.WyzeEmail && hashedPassword) {
 	    console.log('Exchanging credentials for token...');
-	    setAuthStatus('pending', 'Authenticating with Wyze...');
+	    if (rawPassword) {
+	      setAuthStatus('pending', 'Authenticating with Wyze...');
+	    } else {
+	      setAuthStatus('pending', 'Attempting automatic re-auth...');
+	    }
 	    
-	    var hashedPassword = md5(md5(md5(rawPassword)));
 	    var nonce = String(Date.now());
 	    
 	    var req = new XMLHttpRequest();
@@ -319,16 +438,29 @@
 	  'Camera':    { index: 3, name: 'Camera' },
 	  'Lock':      { index: 4, name: 'Lock' },
 	  'GarageDoor': { index: 5, name: 'Garage' },
-	  'WyzeScale': { index: 6, name: 'Scale' }
+	  'WyzeScale': { index: 6, name: 'Scale' },
+	  'JA.SC':     { index: 7, name: 'Vacuum' },
+	  'JA_RO2':    { index: 7, name: 'Vacuum' },
+	  'Vacuum':    { index: 7, name: 'Vacuum' },
+	  'Thermostat': { index: 8, name: 'Thermostat' }
 	};
+	
+	// Wyze sometimes reports vacuums as product_type "Common" or empty — detect by model prefix
+	function detectByModel(model) {
+	  if (!model) return null;
+	  if (model.indexOf('JA_RO') === 0 || model.indexOf('JA.SC') === 0) return { index: 7, name: 'Vacuum' };
+	  if (model.indexOf('CO_EA') === 0) return { index: 8, name: 'Thermostat' };
+	  return null;
+	}
 	
 	function processDevices(devices) {
 	  deviceList = [];
+	  s_refresh_retry_attempts = 0;
 	  
 	  for (var i = 0; i < devices.length; i++) {
 	    var dev = devices[i];
 	    var pt = dev.product_type || '';
-	    var mapped = PRODUCT_TYPE_MAP[pt] || { index: 99, name: pt || 'Other' };
+	    var mapped = PRODUCT_TYPE_MAP[pt] || detectByModel(dev.product_model) || { index: 99, name: pt || 'Other' };
 	    
 	    var dp = dev.device_params || {};
 	    var isPowerOn = 0;
@@ -416,12 +548,45 @@
 	    } else if (req.readyState === 4 && (req.status === 401 || (req.status === 200 && tryParseCode(req.responseText) === 2001))) {
 	      // Token expired — try refresh before giving up
 	      console.log('Token expired, attempting refresh...');
-	      refreshWyzeToken(function(ok) {
-	        if (ok) {
+	      refreshWyzeToken(function(result) {
+	        if (result && result.ok) {
+	          s_refresh_retry_attempts = 0;
 	          fetchDevices();
+	          return;
+	        }
+	
+	        if (result && result.hardFailure) {
+	          clearAuthTokens();
+	          if (hasSavedReauthHash()) {
+	            setAuthStatus('pending', 'Attempting automatic re-auth...');
+	            authenticateWyze(null, function() {
+	              if (wyzeToken) {
+	                s_refresh_retry_attempts = 0;
+	                fetchDevices();
+	              } else {
+	                setAuthStatus('error', 'Session expired. Auto re-auth failed — re-enter password.');
+	                sendAuthStatusToWatch(0);
+	              }
+	            });
+	          } else {
+	            setAuthStatus('error', 'Session expired. Re-enter password to reconnect.');
+	            sendAuthStatusToWatch(0);
+	          }
+	          return;
+	        }
+	
+	        s_refresh_retry_attempts += 1;
+	        if (s_refresh_retry_attempts <= REFRESH_RETRY_MAX) {
+	          var delay = REFRESH_RETRY_BASE_MS * s_refresh_retry_attempts;
+	          setAuthStatus('pending', 'Temporary network issue. Retrying...');
+	          sendAuthStatusToWatch(2);
+	          setTimeout(function() {
+	            fetchDevices();
+	          }, delay);
 	        } else {
-	          setAuthStatus('error', 'Token expired. Refresh failed — re-enter password.');
-	          sendAuthStatusToWatch(0);
+	          s_refresh_retry_attempts = 0;
+	          setAuthStatus('error', 'Refresh failed due to temporary network errors. Try again.');
+	          sendAuthStatusToWatch(2);
 	        }
 	      });
 	    } else if (req.readyState === 4) {
@@ -442,19 +607,25 @@
 	  var refreshToken = localStorage.getItem('wyze_refresh_token');
 	  if (!refreshToken) {
 	    console.log('No refresh token available.');
-	    localStorage.removeItem('wyze_access_token');
-	    wyzeToken = null;
-	    if (callback) callback(false);
+	    if (callback) callback({ ok: false, hardFailure: true, reason: 'no_refresh_token' });
 	    return;
 	  }
 	  var req = new XMLHttpRequest();
 	  req.open('POST', 'https://api.wyzecam.com/app/user/refresh_token', true);
 	  req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
 	  req.onload = function() {
+	    if (req.readyState !== 4) return;
+	
+	    var json = null;
+	    try {
+	      json = JSON.parse(req.responseText);
+	    } catch (parseErr) {
+	      json = null;
+	    }
+	
 	    if (req.readyState === 4 && req.status === 200) {
 	      try {
-	        var json = JSON.parse(req.responseText);
-	        if (json.code === 1 && json.data && json.data.access_token) {
+	        if (json && json.code === 1 && json.data && json.data.access_token) {
 	          console.log('Token refreshed successfully.');
 	          wyzeToken = json.data.access_token;
 	          localStorage.setItem('wyze_access_token', json.data.access_token);
@@ -462,25 +633,24 @@
 	            localStorage.setItem('wyze_refresh_token', json.data.refresh_token);
 	          }
 	          setAuthStatus('success', 'Token refreshed.');
-	          if (callback) callback(true);
+	          if (callback) callback({ ok: true });
 	          return;
 	        }
 	      } catch(e) {
 	        console.log('Refresh parse error:', e);
 	      }
 	    }
-	    // Refresh failed — clear tokens
-	    console.log('Refresh token request failed.');
-	    localStorage.removeItem('wyze_access_token');
-	    localStorage.removeItem('wyze_refresh_token');
-	    wyzeToken = null;
-	    if (callback) callback(false);
+	
+	    if (isHardRefreshFailure(req.status, json)) {
+	      console.log('Refresh token hard-failed.');
+	      if (callback) callback({ ok: false, hardFailure: true, reason: 'invalid_refresh' });
+	    } else {
+	      console.log('Refresh token transient failure. status=' + req.status);
+	      if (callback) callback({ ok: false, hardFailure: false, reason: 'transient' });
+	    }
 	  };
 	  req.onerror = function() {
-	    localStorage.removeItem('wyze_access_token');
-	    localStorage.removeItem('wyze_refresh_token');
-	    wyzeToken = null;
-	    if (callback) callback(false);
+	    if (callback) callback({ ok: false, hardFailure: false, reason: 'network_error' });
 	  };
 	  var payload = buildWyzeBasePayload();
 	  payload.sv = WYZE_SV_REFRESH_TOKEN;
@@ -813,6 +983,7 @@
 	function fetchCameraEvent(id) {
 	  var dev = deviceList[id];
 	  if (!dev || !wyzeToken) return;
+	  var progressRequestId = beginCameraProgressRequest();
 	  console.log('Fetching camera events for ' + dev.name);
 	  var req = new XMLHttpRequest();
 	  req.open('POST', 'https://api.wyzecam.com/app/v2/device/get_event_list', true);
@@ -843,6 +1014,8 @@
 	          }
 	          if (!eventType) eventType = 'Motion';
 	          console.log('DEBUG: eventType=' + eventType);
+	
+	          emitCameraProgress(progressRequestId, 10, false);
 	          
 	          var eventTs = event.event_ts || '';
 	          console.log('DEBUG: raw event_ts=' + eventTs);
@@ -878,12 +1051,14 @@
 	          }
 	          console.log('DEBUG: imageUrl=' + (imageUrl ? imageUrl.substring(0, 60) : '(none)'));
 	          if (imageUrl) {
-	            downloadAndSendImage(imageUrl);
+	            emitCameraProgress(progressRequestId, CAM_PROGRESS_EVENT_END, true);
+	            downloadAndSendImage(imageUrl, progressRequestId);
 	          } else {
 	            console.log('No image URL in event');
 	          }
 	        } else {
 	          console.log('No camera events found: code=' + (json.code || 'n/a'));
+	          emitCameraProgress(progressRequestId, CAM_PROGRESS_EVENT_END, true);
 	          Pebble.sendAppMessage({
 	            "CameraEventType": "No events",
 	            "CameraEventTime": ""
@@ -908,9 +1083,10 @@
 	  req.send(JSON.stringify(payload));
 	}
 	
-	function downloadAndSendImage(url) {
+	function downloadAndSendImage(url, progressRequestId) {
 	  console.log('Downloading camera image...');
 	  console.log('DEBUG: original URL domain=' + url.split('/')[2]);
+	  emitCameraProgress(progressRequestId, CAM_PROGRESS_EVENT_END, true);
 	  // Try original URL first (iOS params should generate valid st tokens)
 	  tryImageDownload(url, function() {
 	    // If original fails, try non-auth domain
@@ -918,17 +1094,38 @@
 	    console.log('DEBUG: trying non-auth domain...');
 	    tryImageDownload(altUrl, function() {
 	      console.log('Both image download attempts failed');
-	    });
-	  });
+	    }, progressRequestId);
+	  }, progressRequestId);
 	}
 	
-	function tryImageDownload(dlUrl, onFail) {
+	function tryImageDownload(dlUrl, onFail, progressRequestId) {
 	  console.log('DEBUG: GET ' + dlUrl.substring(0, 100));
 	  var req = new XMLHttpRequest();
+	  var headerContentLength = 0;
 	  req.open('GET', dlUrl, true);
 	  req.responseType = 'arraybuffer';
 	  req.timeout = 15000;
 	  try { req.setRequestHeader('User-Agent', WYZE_CAM_USER_AGENT); } catch (e) { }
+	  req.onprogress = function(evt) {
+	    var loaded = (evt && evt.loaded) ? evt.loaded : 0;
+	    var total = (evt && evt.lengthComputable && evt.total) ? evt.total : 0;
+	    if (!total && !headerContentLength) {
+	      try {
+	        var cl = req.getResponseHeader('Content-Length');
+	        headerContentLength = cl ? parseInt(cl, 10) : 0;
+	      } catch (e2) {
+	        headerContentLength = 0;
+	      }
+	    }
+	    if (!total && headerContentLength > 0) {
+	      total = headerContentLength;
+	    }
+	    if (total > 0 && loaded >= 0) {
+	      emitCameraStageProgress(progressRequestId, CAM_PROGRESS_EVENT_END, CAM_PROGRESS_DOWNLOAD_END, loaded / total, false);
+	    } else if (loaded > 0) {
+	      emitCameraProgress(progressRequestId, CAM_PROGRESS_EVENT_END + 1, false);
+	    }
+	  };
 	  req.onload = function() {
 	    console.log('DEBUG: onload status=' + req.status);
 	    if (req.status === 200 && req.response) {
@@ -976,7 +1173,8 @@
 	      }
 	      
 	      if (bytes && bytes.length > 100 && bytes[0] === 0xFF) {
-	        processJpegResponse(bytes);
+	        emitCameraProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, true);
+	        processJpegResponse(bytes, progressRequestId);
 	      } else {
 	        console.log('Failed to extract valid JPEG (first: ' + (bytes ? '0x' + bytes[0].toString(16) : 'null') + ', len: ' + (bytes ? bytes.length : 0) + ')');
 	        if (onFail) onFail();
@@ -1002,7 +1200,7 @@
 	// Output: Uint8Array with rows padded to 4-byte boundary (GBitmapFormat1Bit requirement).
 	// Bit packing: LSB-first (bit 0 = leftmost pixel) per the Pebble SDK bitmapgen.py.
 	// Packed as bytes within little-endian 32-bit words. 1 = white, 0 = black.
-	function ditherTo1Bit(rgba, srcW, srcH, dstW, dstH) {
+	function ditherTo1Bit(rgba, srcW, srcH, dstW, dstH, progressRequestId) {
 	  // Step 1: Area-average downscale to grayscale
 	  var gray = new Float32Array(dstW * dstH);
 	  var xRatio = srcW / dstW;
@@ -1023,6 +1221,9 @@
 	        }
 	      }
 	      gray[dy * dstW + dx] = count > 0 ? sum / count : 0;
+	    }
+	    if ((dy % 8) === 0 || dy === dstH - 1) {
+	      emitCameraStageProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, CAM_PROGRESS_PROCESS_END, 0.05 + (0.45 * ((dy + 1) / dstH)), false);
 	    }
 	  }
 	
@@ -1049,6 +1250,7 @@
 	      gray[i] = v < 0 ? 0 : (v > 255 ? 255 : v);
 	    }
 	  }
+	  emitCameraStageProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, CAM_PROGRESS_PROCESS_END, 0.6, false);
 	
 	  // Step 3: Unsharp mask — sharpen edges before dithering for crisper 1-bit output
 	  // blur = 3×3 box blur, then sharpened = original + amount * (original - blur)
@@ -1071,6 +1273,9 @@
 	      var orig = gray[y * dstW + x];
 	      var v = orig + amount * (orig - blur);
 	      sharp[y * dstW + x] = v < 0 ? 0 : (v > 255 ? 255 : v);
+	    }
+	    if ((y % 8) === 0 || y === dstH - 1) {
+	      emitCameraStageProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, CAM_PROGRESS_PROCESS_END, 0.6 + (0.2 * ((y + 1) / dstH)), false);
 	    }
 	  }
 	
@@ -1100,12 +1305,15 @@
 	      if (y + 1 < dstH && x + 1 < dstW)  sharp[idx + dstW + 1]   += err;
 	      if (y + 2 < dstH)                   sharp[idx + 2 * dstW]   += err;
 	    }
+	    if ((y % 8) === 0 || y === dstH - 1) {
+	      emitCameraStageProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, CAM_PROGRESS_PROCESS_END, 0.8 + (0.2 * ((y + 1) / dstH)), false);
+	    }
 	  }
 	
 	  return packed;
 	}
 	
-	function processJpegResponse(jpegData) {
+	function processJpegResponse(jpegData, progressRequestId) {
 	  console.log('Image downloaded: ' + jpegData.length + ' bytes');
 	  // Debug: check JPEG header bytes
 	  if (jpegData.length >= 4) {
@@ -1117,7 +1325,11 @@
 	    var srcW = decoded.width;
 	    var srcH = decoded.height;
 	    var rgba = decoded.data;
+	    var targetSize = getCameraTargetSize();
+	    var targetW = targetSize.width;
+	    var targetH = targetSize.height;
 	    console.log('JPEG decoded: ' + srcW + 'x' + srcH);
+	    emitCameraProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END + 1, false);
 	
 	    // Detect B&W platform
 	    var isBW = false;
@@ -1129,37 +1341,43 @@
 	
 	    if (isBW) {
 	      // B&W: Floyd-Steinberg dither to 1-bit, packed for GBitmapFormat1Bit
-	      var pebbleData = ditherTo1Bit(rgba, srcW, srcH, CAM_TARGET_W, CAM_TARGET_H);
+	      var pebbleData = ditherTo1Bit(rgba, srcW, srcH, targetW, targetH, progressRequestId);
 	      console.log('Pebble 1-bit: ' + pebbleData.length + ' bytes');
 	      var totalChunks = Math.ceil(pebbleData.length / CAM_CHUNK_SIZE);
-	      sendImageChunk(pebbleData, 0, totalChunks, CAM_TARGET_W, CAM_TARGET_H);
+	      emitCameraProgress(progressRequestId, CAM_PROGRESS_PROCESS_END, true);
+	      sendImageChunk(pebbleData, 0, totalChunks, targetW, targetH, progressRequestId);
 	    } else {
 	      // Color: existing 8-bit conversion
-	      var pebbleData = new Uint8Array(CAM_TARGET_W * CAM_TARGET_H);
-	      for (var y = 0; y < CAM_TARGET_H; y++) {
-	        var srcY = Math.floor(y * srcH / CAM_TARGET_H);
-	        for (var x = 0; x < CAM_TARGET_W; x++) {
-	          var srcX = Math.floor(x * srcW / CAM_TARGET_W);
+	      var pebbleData = new Uint8Array(targetW * targetH);
+	      for (var y = 0; y < targetH; y++) {
+	        var srcY = Math.floor(y * srcH / targetH);
+	        for (var x = 0; x < targetW; x++) {
+	          var srcX = Math.floor(x * srcW / targetW);
 	          var si = (srcY * srcW + srcX) * 4;
 	          var r = rgba[si];
 	          var g = rgba[si + 1];
 	          var b = rgba[si + 2];
 	          // Convert to Pebble 8-bit color: 0b11RRGGBB
-	          pebbleData[y * CAM_TARGET_W + x] = 0xC0 | ((r >> 6) << 4) | ((g >> 6) << 2) | (b >> 6);
+	          pebbleData[y * targetW + x] = 0xC0 | ((r >> 6) << 4) | ((g >> 6) << 2) | (b >> 6);
+	        }
+	        if ((y % 8) === 0 || y === targetH - 1) {
+	          emitCameraStageProgress(progressRequestId, CAM_PROGRESS_DOWNLOAD_END, CAM_PROGRESS_PROCESS_END, (y + 1) / targetH, false);
 	        }
 	      }
 	      console.log('Pebble 8-bit: ' + pebbleData.length + ' bytes');
 	      var totalChunks = Math.ceil(pebbleData.length / CAM_CHUNK_SIZE);
-	      sendImageChunk(pebbleData, 0, totalChunks, CAM_TARGET_W, CAM_TARGET_H);
+	      emitCameraProgress(progressRequestId, CAM_PROGRESS_PROCESS_END, true);
+	      sendImageChunk(pebbleData, 0, totalChunks, targetW, targetH, progressRequestId);
 	    }
 	  } catch (e) {
 	    console.log('JPEG decode error: ' + e);
 	  }
 	}
 	
-	function sendImageChunk(data, chunkIndex, totalChunks, width, height) {
+	function sendImageChunk(data, chunkIndex, totalChunks, width, height, progressRequestId) {
 	  if (chunkIndex >= totalChunks) {
 	    console.log('All image chunks sent');
+	    emitCameraProgress(progressRequestId, CAM_PROGRESS_TRANSFER_END, true);
 	    return;
 	  }
 	  var start = chunkIndex * 1500;
@@ -1175,9 +1393,255 @@
 	  };
 	  
 	  Pebble.sendAppMessage(msg, function() {
-	    setTimeout(function() { sendImageChunk(data, chunkIndex + 1, totalChunks, width, height); }, 100);
+	    emitCameraStageProgress(progressRequestId, CAM_PROGRESS_PROCESS_END, CAM_PROGRESS_TRANSFER_END, (chunkIndex + 1) / totalChunks, false);
+	    setTimeout(function() { sendImageChunk(data, chunkIndex + 1, totalChunks, width, height, progressRequestId); }, 100);
 	  }, function() {
-	    setTimeout(function() { sendImageChunk(data, chunkIndex, totalChunks, width, height); }, 1500);
+	    setTimeout(function() { sendImageChunk(data, chunkIndex, totalChunks, width, height, progressRequestId); }, 1500);
+	  });
+	}
+	
+	// ===================================================================
+	// VACUUM (Venus service) — live-verified May 2026.
+	//   Host: wyze-venus-service-vn.wyzecam.com
+	//   Sign: signature2 = HMAC-MD5(md5(token + VENUS_SECRET), sortedQuery | jsonBody)
+	// ===================================================================
+	var VENUS_APPID  = 'venp_4c30f812828de875';
+	var VENUS_SECRET = 'CVCSNoa0ALsNEpgKls6ybVTVOmGzFoiq';
+	
+	function venusHeaders(sig) {
+	  return {
+	    'access_token': wyzeToken,
+	    'requestid': md5(md5(String(Date.now()))),
+	    'appid': VENUS_APPID,
+	    'appinfo': 'wyze_android_' + WYZE_APP_VERSION,
+	    'phoneid': WYZE_PHONE_ID,
+	    'User-Agent': 'wyze_android_' + WYZE_APP_VERSION,
+	    'signature2': sig
+	  };
+	}
+	
+	function venusGet(path, params, callback) {
+	  var merged = {};
+	  for (var k in params) merged[k] = params[k];
+	  merged.nonce = Date.now();
+	  var keys = Object.keys(merged).sort();
+	  var sortedStr = '', qs = '';
+	  for (var i = 0; i < keys.length; i++) {
+	    if (i > 0) { sortedStr += '&'; qs += '&'; }
+	    sortedStr += keys[i] + '=' + merged[keys[i]];
+	    qs += encodeURIComponent(keys[i]) + '=' + encodeURIComponent(merged[keys[i]]);
+	  }
+	  var sig = md5(sortedStr, md5(wyzeToken + VENUS_SECRET));
+	  var headers = venusHeaders(sig);
+	  var req = new XMLHttpRequest();
+	  req.open('GET', 'https://wyze-venus-service-vn.wyzecam.com' + path + '?' + qs, true);
+	  for (var h in headers) req.setRequestHeader(h, headers[h]);
+	  req.onload = function() {
+	    if (req.readyState === 4 && req.status === 200) {
+	      try { callback(null, JSON.parse(req.responseText)); } catch (e) { callback(e); }
+	    } else callback(new Error('HTTP ' + req.status));
+	  };
+	  req.onerror = function() { callback(new Error('Network error')); };
+	  req.send();
+	}
+	
+	function venusPost(path, body, callback) {
+	  var merged = {};
+	  for (var k in body) merged[k] = body[k];
+	  merged.nonce = String(Date.now());
+	  var ser = JSON.stringify(merged);
+	  var sig = md5(ser, md5(wyzeToken + VENUS_SECRET));
+	  var headers = venusHeaders(sig);
+	  headers['Content-Type'] = 'application/json;charset=utf-8';
+	  var req = new XMLHttpRequest();
+	  req.open('POST', 'https://wyze-venus-service-vn.wyzecam.com' + path, true);
+	  for (var h in headers) req.setRequestHeader(h, headers[h]);
+	  req.onload = function() {
+	    if (req.readyState === 4 && req.status === 200) {
+	      try { callback(null, JSON.parse(req.responseText)); } catch (e) { callback(e); }
+	    } else callback(new Error('HTTP ' + req.status));
+	  };
+	  req.onerror = function() { callback(new Error('Network error')); };
+	  req.send(ser);
+	}
+	
+	var VACUUM_MODE_TEXT = {
+	  0: 'Idle', 1: 'Cleaning', 2: 'Paused', 3: 'Error',
+	  4: 'Docking', 5: 'Charging', 11: 'Charged', 39: 'Spot'
+	};
+	
+	function fetchVacuumStatus(id) {
+	  var dev = deviceList[id];
+	  if (!dev || !wyzeToken) return;
+	  venusGet('/plugin/venus/get_iot_prop',
+	    { did: dev.mac, keys: 'iot_state,battary,mode,charge_state,fault_code' },
+	    function(err, res) {
+	      if (err || !res || res.code != 1 || !res.data) {
+	        console.log('Vacuum status error: ' + (err || (res && res.msg)));
+	        Pebble.sendAppMessage({ 'VacuumBattery': -1, 'VacuumMode': -1, 'VacuumModeText': 'Offline' });
+	        return;
+	      }
+	      var d = res.data;
+	      var battery = (d.battary !== undefined) ? d.battary : (d.battery || 0); // Wyze API typo
+	      var mode = (d.mode !== undefined) ? d.mode : -1;
+	      var modeText = VACUUM_MODE_TEXT[mode] || ('Mode ' + mode);
+	      if (d.charge_state === 1 && (mode === 0 || mode === 5)) {
+	        modeText = battery >= 100 ? 'Charged' : 'Charging';
+	      }
+	      var iotOnline = (d.iot_state === 'connected' || d.iot_state === 1) ? 1 : 0;
+	      console.log('Vacuum status: battery=' + battery + ' mode=' + mode + ' (' + modeText + ')');
+	      Pebble.sendAppMessage({
+	        'VacuumBattery': battery,
+	        'VacuumMode': mode,
+	        'VacuumModeText': modeText.substring(0, 31),
+	        'DeviceIndex': id,
+	        'DeviceOnline': iotOnline
+	      });
+	      dev.online = iotOnline;
+	    }
+	  );
+	}
+	
+	// VacuumAction: 0=Start, 1=Pause, 2=Dock
+	function vacuumControl(id, action) {
+	  var dev = deviceList[id];
+	  if (!dev || !wyzeToken) return;
+	  var body;
+	  if (action === 0)      body = { type: 0, value: 1, vacuumMopMode: 0 };
+	  else if (action === 1) body = { type: 0, value: 2, vacuumMopMode: 0 };
+	  else if (action === 2) body = { type: 3, value: 1, vacuumMopMode: 0 };
+	  else { console.log('Unknown vacuum action: ' + action); return; }
+	  console.log('Vacuum action ' + action + ' on ' + dev.mac);
+	  venusPost('/plugin/venus/' + dev.mac + '/control', body, function(err, res) {
+	    if (err) { console.log('Vacuum action err: ' + err); return; }
+	    console.log('Vacuum action result: code=' + (res && res.code));
+	    setTimeout(function() { fetchVacuumStatus(id); }, 2500);
+	  });
+	}
+	
+	// ===================================================================
+	// THERMOSTAT (Earth service via Olive signing). Implemented per wyzeapy
+	// production code. NOT live-verified — account has no thermostat.
+	// ===================================================================
+	var EARTH_HOST = 'earth-service.wyzecam.com';
+	var THERMO_KEYS = 'iot_state,temperature,humidity,mode_sys,fan_mode,working_state,heat_sp,cool_sp,emheat,kid_lock';
+	var THERMO_MODE_NAMES = { 0: 'OFF', 1: 'AUTO', 2: 'COOL', 3: 'HEAT' };
+	var THERMO_MODE_VALS  = ['off', 'auto', 'cool', 'heat'];
+	var THERMO_FAN_VALS   = ['auto', 'on', 'cycle'];
+	
+	function oliveServiceGet(host, path, params, callback) {
+	  var nonce = Date.now();
+	  var merged = { nonce: nonce };
+	  for (var k in params) merged[k] = params[k];
+	  var keys = Object.keys(merged).sort();
+	  var sortedStr = '', qs = '';
+	  for (var i = 0; i < keys.length; i++) {
+	    if (i > 0) { sortedStr += '&'; qs += '&'; }
+	    sortedStr += keys[i] + '=' + merged[keys[i]];
+	    qs += encodeURIComponent(keys[i]) + '=' + encodeURIComponent(merged[keys[i]]);
+	  }
+	  var sig = md5(sortedStr, md5(wyzeToken + SCALE_SIGNING_SECRET));
+	  var requestId = md5(md5(String(nonce)));
+	  var req = new XMLHttpRequest();
+	  req.open('GET', 'https://' + host + path + '?' + qs, true);
+	  req.setRequestHeader('access_token', wyzeToken);
+	  req.setRequestHeader('requestid', requestId);
+	  req.setRequestHeader('appid', SCALE_APP_ID);
+	  req.setRequestHeader('appinfo', 'wyze_android_' + WYZE_APP_VERSION);
+	  req.setRequestHeader('phoneid', WYZE_PHONE_ID);
+	  req.setRequestHeader('User-Agent', 'wyze_android_' + WYZE_APP_VERSION);
+	  req.setRequestHeader('signature2', sig);
+	  req.onload = function() {
+	    if (req.readyState === 4 && req.status === 200) {
+	      try { callback(null, JSON.parse(req.responseText)); } catch (e) { callback(e); }
+	    } else callback(new Error('HTTP ' + req.status));
+	  };
+	  req.onerror = function() { callback(new Error('Network error')); };
+	  req.send();
+	}
+	
+	function oliveServicePost(host, path, body, callback) {
+	  var merged = { nonce: String(Date.now()) };
+	  for (var k in body) merged[k] = body[k];
+	  var ser = JSON.stringify(merged);
+	  var sig = md5(ser, md5(wyzeToken + SCALE_SIGNING_SECRET));
+	  var requestId = md5(md5(String(Date.now())));
+	  var req = new XMLHttpRequest();
+	  req.open('POST', 'https://' + host + path, true);
+	  req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+	  req.setRequestHeader('access_token', wyzeToken);
+	  req.setRequestHeader('requestid', requestId);
+	  req.setRequestHeader('appid', SCALE_APP_ID);
+	  req.setRequestHeader('appinfo', 'wyze_android_' + WYZE_APP_VERSION);
+	  req.setRequestHeader('phoneid', WYZE_PHONE_ID);
+	  req.setRequestHeader('User-Agent', 'wyze_android_' + WYZE_APP_VERSION);
+	  req.setRequestHeader('signature2', sig);
+	  req.onload = function() {
+	    if (req.readyState === 4 && req.status === 200) {
+	      try { callback(null, JSON.parse(req.responseText)); } catch (e) { callback(e); }
+	    } else callback(new Error('HTTP ' + req.status));
+	  };
+	  req.onerror = function() { callback(new Error('Network error')); };
+	  req.send(ser);
+	}
+	
+	function fetchThermostatStatus(id) {
+	  var dev = deviceList[id];
+	  if (!dev || !wyzeToken) return;
+	  oliveServiceGet(EARTH_HOST, '/plugin/earth/get_iot_prop',
+	    { did: dev.mac, keys: THERMO_KEYS },
+	    function(err, res) {
+	      if (err || !res || res.code != 1 || !res.data) {
+	        console.log('Thermo status error: ' + (err || (res && res.msg)));
+	        Pebble.sendAppMessage({ 'ThermoTemp': -9999, 'ThermoMode': 'OFFLINE' });
+	        return;
+	      }
+	      var d = res.data;
+	      var temp = (d.temperature !== undefined) ? d.temperature : -999;
+	      var humidity = (d.humidity !== undefined) ? d.humidity : -1;
+	      var modeKey = String(d.mode_sys || 'off').toLowerCase();
+	      var modeIdx = THERMO_MODE_VALS.indexOf(modeKey);
+	      var modeName = THERMO_MODE_NAMES[modeIdx] || modeKey.toUpperCase();
+	      var heatSp = (d.heat_sp !== undefined) ? parseInt(d.heat_sp, 10) : 0;
+	      var coolSp = (d.cool_sp !== undefined) ? parseInt(d.cool_sp, 10) : 0;
+	      var fanKey = String(d.fan_mode || 'auto').toLowerCase();
+	      var working = String(d.working_state || 'idle');
+	      var iotOnline = (d.iot_state === 'connected' || d.iot_state === 1) ? 1 : 0;
+	      console.log('Thermo: temp=' + temp + ' hum=' + humidity + ' mode=' + modeName +
+	        ' heat=' + heatSp + ' cool=' + coolSp + ' fan=' + fanKey);
+	      Pebble.sendAppMessage({
+	        'ThermoTemp': Math.round(temp * 10),  // x10 fixed-point F
+	        'ThermoHumidity': humidity,
+	        'ThermoMode': modeName.substring(0, 15),
+	        'ThermoHeatSP': heatSp,
+	        'ThermoCoolSP': coolSp,
+	        'ThermoFan': fanKey.substring(0, 15),
+	        'ThermoWorking': working.substring(0, 15),
+	        'DeviceIndex': id,
+	        'DeviceOnline': iotOnline
+	      });
+	      dev.online = iotOnline;
+	    }
+	  );
+	}
+	
+	// ThermoAction: 0=mode, 1=heat_sp, 2=cool_sp, 3=fan_mode
+	function thermostatControl(id, action, value) {
+	  var dev = deviceList[id];
+	  if (!dev || !wyzeToken) return;
+	  var prop, val;
+	  if (action === 0)      { prop = 'mode_sys'; val = THERMO_MODE_VALS[value] || 'off'; }
+	  else if (action === 1) { prop = 'heat_sp';  val = String(value); }
+	  else if (action === 2) { prop = 'cool_sp';  val = String(value); }
+	  else if (action === 3) { prop = 'fan_mode'; val = THERMO_FAN_VALS[value] || 'auto'; }
+	  else { console.log('Unknown thermo action ' + action); return; }
+	  console.log('Thermo set ' + prop + '=' + val + ' on ' + dev.mac);
+	  var body = { did: dev.mac, model: dev.model, props: {}, is_sub_device: 0 };
+	  body.props[prop] = val;
+	  oliveServicePost(EARTH_HOST, '/plugin/earth/set_iot_prop_by_topic', body, function(err, res) {
+	    if (err) { console.log('Thermo set err: ' + err); return; }
+	    console.log('Thermo set result: code=' + (res && res.code));
+	    setTimeout(function() { fetchThermostatStatus(id); }, 1500);
 	  });
 	}
 	
@@ -1232,9 +1696,19 @@
 	  // SECURITY: Grab password before wiping from storage so auth can use it in-memory only.
 	  var rawPassword = SETTINGS.WyzePassword || null;
 	  if (rawPassword) {
+	    if (isAutoReauthEnabled()) {
+	      SETTINGS.WyzePasswordHash = md5(md5(md5(rawPassword)));
+	      console.log('Auto re-auth is enabled; updated saved password hash.');
+	    } else {
+	      delete SETTINGS.WyzePasswordHash;
+	    }
 	    delete SETTINGS.WyzePassword;
 	    localStorage.setItem('clay-settings', JSON.stringify(SETTINGS));
 	    console.log('Password captured in-memory and wiped from storage immediately.');
+	  } else if (!isAutoReauthEnabled() && SETTINGS.WyzePasswordHash) {
+	    delete SETTINGS.WyzePasswordHash;
+	    localStorage.setItem('clay-settings', JSON.stringify(SETTINGS));
+	    console.log('Auto re-auth disabled; removed saved password hash.');
 	  }
 	  
 	  // Check if user requested logout via Clay toggle.
@@ -1256,6 +1730,22 @@
 	
 	Pebble.addEventListener('appmessage', function(e) {
 	  var d = e.payload;
+	  if (d.VacuumRequest !== undefined) {
+	    fetchVacuumStatus(d.VacuumRequest);
+	    return;
+	  }
+	  if (d.VacuumAction !== undefined && d.ActionToggle !== undefined) {
+	    vacuumControl(d.ActionToggle, d.VacuumAction);
+	    return;
+	  }
+	  if (d.ThermoRequest !== undefined) {
+	    fetchThermostatStatus(d.ThermoRequest);
+	    return;
+	  }
+	  if (d.ThermoAction !== undefined && d.ActionToggle !== undefined) {
+	    thermostatControl(d.ActionToggle, d.ThermoAction, d.ThermoActionValue || 0);
+	    return;
+	  }
 	  if (d.ActionToggle !== undefined) {
 	    // Check if this is an advanced property action (has ActionType)
 	    if (d.ActionType !== undefined && d.ActionType > 0) {
@@ -1281,8 +1771,6 @@
 	  } else if (d.ActionRefresh !== undefined) {
 	    fetchDevices();
 	    fetchShortcuts();
-	  } else if (d.ActionLogout !== undefined) {
-	    fetchDevices();
 	  } else if (d.ActionLogout !== undefined) {
 	    wyzeLogout();
 	  /* TEST AUTH — uncomment for testing, see test_menu_instructions.md to re-disable
@@ -1366,7 +1854,7 @@
 /* 5 */
 /***/ (function(module, exports) {
 
-	module.exports = {"ActionLogout":10011,"ActionRefresh":10010,"ActionToggle":10009,"ActionType":10017,"ActionValue":10018,"AppReady":10000,"AuthStatus":10001,"CameraChunkData":10034,"CameraChunkIndex":10032,"CameraChunkTotal":10033,"CameraEventTime":10031,"CameraEventType":10030,"CameraHeight":10036,"CameraRequest":10029,"CameraWidth":10035,"DeviceCount":10002,"DeviceHasGarage":10037,"DeviceIndex":10005,"DeviceName":10006,"DeviceOnline":10008,"DeviceState":10007,"DeviceType":10004,"DeviceTypeIndex":10003,"GarageRequest":10038,"ScaleBMI":10021,"ScaleBodyFat":10020,"ScaleDate":10024,"ScaleMuscle":10022,"ScaleWater":10023,"ScaleWeight":10019,"ShortcutCount":10025,"ShortcutIndex":10026,"ShortcutName":10027,"ShortcutTrigger":10028,"TestAuth":10039,"WyzeAPIKey":10015,"WyzeEmail":10012,"WyzeKeyID":10014,"WyzeLogout":10016,"WyzePassword":10013}
+	module.exports = {"ActionLogout":10011,"ActionRefresh":10010,"ActionToggle":10009,"ActionType":10017,"ActionValue":10018,"AppReady":10000,"AuthStatus":10001,"CameraChunkData":10034,"CameraChunkIndex":10032,"CameraChunkTotal":10033,"CameraEventTime":10031,"CameraEventType":10030,"CameraHeight":10036,"CameraProgress":10037,"CameraRequest":10029,"CameraWidth":10035,"DeviceCount":10002,"DeviceHasGarage":10038,"DeviceIndex":10005,"DeviceName":10006,"DeviceOnline":10008,"DeviceState":10007,"DeviceType":10004,"DeviceTypeIndex":10003,"GarageRequest":10039,"ScaleBMI":10021,"ScaleBodyFat":10020,"ScaleDate":10024,"ScaleMuscle":10022,"ScaleWater":10023,"ScaleWeight":10019,"ShortcutCount":10025,"ShortcutIndex":10026,"ShortcutName":10027,"ShortcutTrigger":10028,"TestAuth":10040,"ThermoAction":10054,"ThermoActionValue":10055,"ThermoCoolSP":10051,"ThermoFan":10052,"ThermoHeatSP":10050,"ThermoHumidity":10048,"ThermoMode":10049,"ThermoRequest":10046,"ThermoTemp":10047,"ThermoWorking":10053,"VacuumAction":10045,"VacuumBattery":10042,"VacuumMode":10043,"VacuumModeText":10044,"VacuumRequest":10041,"WyzeAPIKey":10015,"WyzeEmail":10012,"WyzeKeyID":10014,"WyzeLogout":10016,"WyzePassword":10013}
 
 /***/ }),
 /* 6 */
@@ -1436,6 +1924,13 @@
 	        {
 	          "type": "heading",
 	          "defaultValue": "Account"
+	        },
+	        {
+	          "type": "toggle",
+	          "messageKey": "WyzeAutoReauth",
+	          "defaultValue": false,
+	          "label": "Auto Re-auth (Optional)",
+	          "description": "If enabled, stores a one-way password hash on this phone to automatically recover sessions when tokens expire."
 	        },
 	        {
 	          "type": "toggle",

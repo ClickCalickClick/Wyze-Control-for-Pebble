@@ -15,3 +15,34 @@ scratch/
 # OS files
 .DS_Store
 Thumbs.db
+
+# API audit and test outputs (contain device IDs, MACs, and credentials)
+api_audit*.json
+api_audit*.log
+*_audit*.json
+*_audit*.log
+*_output.log
+*_roundtrip.log
+control_roundtrip.log
+services_output.log
+audit_output.log
+
+# Test/development scripts with hardcoded device data
+test_control_roundtrip.js
+test_extra_services.js
+test_full_api_audit.js
+test_garage*.js
+test_scale*.js
+test_camera*.js
+test_api.js
+test_endpoints.js
+
+# Screenshots from emulator testing
+screenshot*.png
+screenshot_*.png
+
+# Temporary development files
+wyzer-temp/
+resolve_test.js
+web_search.js
+wyze_test.js

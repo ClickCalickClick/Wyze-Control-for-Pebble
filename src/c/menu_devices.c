@@ -11,7 +11,7 @@ static int s_current_type_index = 0;
 static void filter_devices(void) {
   s_filtered_count = 0;
   for(int i = 0; i < s_device_count; i++) {
-    if (s_current_type_index == 99 && s_devices[i].type_index != 0 && s_devices[i].type_index != 1 && s_devices[i].type_index != 2 && s_devices[i].type_index != 3 && s_devices[i].type_index != 4 && s_devices[i].type_index != 5 && s_devices[i].type_index != 6) {
+    if (s_current_type_index == 99 && s_devices[i].type_index != 0 && s_devices[i].type_index != 1 && s_devices[i].type_index != 2 && s_devices[i].type_index != 3 && s_devices[i].type_index != 4 && s_devices[i].type_index != 5 && s_devices[i].type_index != 6 && s_devices[i].type_index != 7 && s_devices[i].type_index != 8) {
       s_filtered_indices[s_filtered_count++] = i;
     } else if (s_current_type_index == 5 && s_devices[i].has_garage) {
       // Dual-listing: cameras with garage dongle also appear in Garage category
@@ -56,6 +56,10 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
     snprintf(state_buf, sizeof(state_buf), dev.state ? "Open" : "Closed");
   } else if (dev.type_index == 6) { // Scale
     snprintf(state_buf, sizeof(state_buf), dev.state ? "Connected" : "Offline");
+  } else if (dev.type_index == 7) { // Vacuum
+    snprintf(state_buf, sizeof(state_buf), "Vacuum");
+  } else if (dev.type_index == 8) { // Thermostat
+    snprintf(state_buf, sizeof(state_buf), "Thermostat");
   } else if (dev.type_index >= 99) { // Others — show raw type
     snprintf(state_buf, sizeof(state_buf), "%s", dev.type_name);
   } else {
@@ -82,6 +86,10 @@ static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, v
     window_garage_push(d_idx);
   } else if (type == 6) {
     window_scale_push(d_idx);
+  } else if (type == 7) {
+    window_vacuum_push(d_idx);
+  } else if (type == 8) {
+    window_thermostat_push(d_idx);
   } else if (type >= 99) {
     // "Other" devices are display-only, not clickable
     return;

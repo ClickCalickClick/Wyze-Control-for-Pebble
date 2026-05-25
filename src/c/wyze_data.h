@@ -42,6 +42,7 @@ void window_garage_push(int device_index);
 void window_garage_refresh(void);
 void window_garage_receive_chunk(int chunk_index, int chunk_total, uint8_t *data, int data_len, int width, int height);
 void window_garage_receive_event(const char *event_type, const char *event_time);
+void window_garage_receive_progress(int percent);
 
 // Scale data
 #define SCALE_BUF_LEN 32
@@ -72,6 +73,33 @@ void menu_shortcuts_reload_data(void);
 void window_camera_push(int device_index);
 void window_camera_receive_chunk(int chunk_index, int chunk_total, uint8_t *data, int data_len, int width, int height);
 void window_camera_receive_event(const char *event_type, const char *event_time);
+void window_camera_receive_progress(int percent);
+
+// Vacuum
+typedef struct {
+  int battery;
+  int mode;
+  int online;
+  char mode_text[24];
+} VacuumData;
+extern VacuumData s_vacuum_data;
+void window_vacuum_push(int device_index);
+void window_vacuum_refresh(void);
+
+// Thermostat
+typedef struct {
+  int temp_x10;       // Current temperature x10 (e.g. 723 = 72.3°F)
+  int humidity;
+  int heat_sp;
+  int cool_sp;
+  int online;
+  char mode[16];      // "OFF" "AUTO" "COOL" "HEAT"
+  char fan[16];       // "auto" "on" "cycle"
+  char working[16];   // "idle" "heating" "cooling" "fan"
+} ThermoData;
+extern ThermoData s_thermo_data;
+void window_thermostat_push(int device_index);
+void window_thermostat_refresh(void);
 
 // Image target routing: 0=camera window, 1=garage window
 void wyze_set_image_target(int target);

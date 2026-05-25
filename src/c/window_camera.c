@@ -34,6 +34,30 @@ static int s_device_index = -1;
 static char s_event_type_buf[48];
 static char s_event_time_buf[48];
 static char s_loading_buf[32];
+static int s_progress_percent = -1;
+
+static void set_loading_percent(int percent) {
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  if (percent < s_progress_percent) return;
+  s_progress_percent = percent;
+  snprintf(s_loading_buf, sizeof(s_loading_buf), "Loading %d%%", s_progress_percent);
+  if (s_loading_layer) {
+    text_layer_set_text(s_loading_layer, s_loading_buf);
+  }
+}
+
+#ifdef PBL_COLOR
+static int get_camera_image_height(void) {
+#if defined(PBL_PLATFORM_EMERY)
+  return 132;
+#elif defined(PBL_PLATFORM_GABBRO)
+  return 96;
+#else
+  return 84;
+#endif
+}
+#endif
 
 #ifdef PBL_COLOR
 static void free_image(void) {
@@ -88,11 +112,12 @@ static void window_load(Window *window) {
 #ifdef PBL_COLOR
   // Bitmap layer for camera thumbnail (below name, above event text)
   int img_y = y + 22;
-  s_bitmap_layer = bitmap_layer_create(GRect(0, img_y, bounds.size.w, 84));
+  int img_h = get_camera_image_height();
+  s_bitmap_layer = bitmap_layer_create(GRect(0, img_y, bounds.size.w, img_h));
   bitmap_layer_set_compositing_mode(s_bitmap_layer, GCompOpSet);
   bitmap_layer_set_alignment(s_bitmap_layer, GAlignCenter);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_bitmap_layer));
-  int text_y = img_y + 84;
+  int text_y = img_y + img_h;
 #else
   // B&W: Bitmap layer for dithered camera thumbnail
   int img_y = y + 22;
@@ -105,7 +130,7 @@ static void window_load(Window *window) {
 
   // Loading indicator
   s_loading_layer = text_layer_create(GRect(5, text_y, bounds.size.w - 10, 24));
-  text_layer_set_text(s_loading_layer, "Loading events...");
+  text_layer_set_text(s_loading_layer, "Loading 0%");
   text_layer_set_font(s_loading_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
   text_layer_set_text_alignment(s_loading_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_loading_layer));
@@ -131,7 +156,8 @@ static void window_appear(Window *window) {
     text_layer_set_text(s_event_type_layer, "");
     text_layer_set_text(s_event_time_layer, "");
 
-    text_layer_set_text(s_loading_layer, "Loading events...");
+    s_progress_percent = -1;
+    set_loading_percent(0);
 
     wyze_set_image_target(0); // Route image data to camera window
     DictionaryIterator *iter;
@@ -180,9 +206,12 @@ void window_camera_receive_event(const char *event_type, const char *event_time)
     strncpy(s_event_time_buf, event_time, sizeof(s_event_time_buf) - 1);
     s_event_time_buf[sizeof(s_event_time_buf) - 1] = '\0';
   }
-  if (s_loading_layer) text_layer_set_text(s_loading_layer, "");
   if (s_event_type_layer) text_layer_set_text(s_event_type_layer, s_event_type_buf);
   if (s_event_time_layer) text_layer_set_text(s_event_time_layer, s_event_time_buf);
+}
+
+void window_camera_receive_progress(int percent) {
+  set_loading_percent(percent);
 }
 
 void window_camera_receive_chunk(int chunk_index, int chunk_total, uint8_t *data, int data_len, int width, int height) {
@@ -218,12 +247,9 @@ void window_camera_receive_chunk(int chunk_index, int chunk_total, uint8_t *data
   }
   s_chunks_received++;
 
-  // Update loading text with progress
-  snprintf(s_loading_buf, sizeof(s_loading_buf), "Image %d/%d", s_chunks_received, s_chunks_total);
-  if (s_loading_layer) text_layer_set_text(s_loading_layer, s_loading_buf);
-
   // Final chunk: create GBitmap and display
   if (s_chunks_received >= s_chunks_total) {
+    set_loading_percent(100);
     APP_LOG(APP_LOG_LEVEL_INFO, "Camera: all %d chunks received, creating bitmap", s_chunks_total);
     s_bitmap = gbitmap_create_blank(GSize(s_img_width, s_img_height), GBitmapFormat8Bit);
     if (s_bitmap) {
@@ -281,12 +307,9 @@ void window_camera_receive_chunk(int chunk_index, int chunk_total, uint8_t *data
   }
   s_bw_chunks_received++;
 
-  // Update loading text with progress
-  snprintf(s_loading_buf, sizeof(s_loading_buf), "Image %d/%d", s_bw_chunks_received, s_bw_chunks_total);
-  if (s_loading_layer) text_layer_set_text(s_loading_layer, s_loading_buf);
-
   // Final chunk: create GBitmap and display
   if (s_bw_chunks_received >= s_bw_chunks_total) {
+    set_loading_percent(100);
     APP_LOG(APP_LOG_LEVEL_INFO, "Camera BW: all %d chunks received, creating bitmap", s_bw_chunks_total);
     s_bw_bitmap = gbitmap_create_blank(GSize(s_bw_img_width, s_bw_img_height), GBitmapFormat1Bit);
     if (s_bw_bitmap) {

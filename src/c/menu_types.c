@@ -3,9 +3,9 @@
 
 // Define known device categories
 // Row 0 is Shortcuts (special), rows 1+ are device categories
-static char *s_type_names[] = {"* Shortcuts", "Lights", "Plugs", "Switches", "Cameras", "Locks", "Garage Doors", "Scales", "Others"};
-static int s_type_indices[] = {-1, 0, 1, 2, 3, 4, 5, 6, 99};
-#define NUM_ROWS 9
+static char *s_type_names[] = {"* Shortcuts", "Lights", "Plugs", "Switches", "Cameras", "Locks", "Garage Doors", "Scales", "Vacuums", "Thermostats", "Others"};
+static int s_type_indices[] = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 99};
+#define NUM_ROWS 11
 // To re-enable TEST menu: add "** TEST **" to s_type_names, -99 to s_type_indices, set NUM_ROWS=10
 
 static Window *s_window;
@@ -52,7 +52,7 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 
   int count = 0;
   for(int i = 0; i < s_device_count; i++) {
-    if(target_type == 99 && s_devices[i].type_index != 0 && s_devices[i].type_index != 1 && s_devices[i].type_index != 2 && s_devices[i].type_index != 3 && s_devices[i].type_index != 4 && s_devices[i].type_index != 5 && s_devices[i].type_index != 6) count++;
+    if(target_type == 99 && s_devices[i].type_index != 0 && s_devices[i].type_index != 1 && s_devices[i].type_index != 2 && s_devices[i].type_index != 3 && s_devices[i].type_index != 4 && s_devices[i].type_index != 5 && s_devices[i].type_index != 6 && s_devices[i].type_index != 7 && s_devices[i].type_index != 8) count++;
     else if (target_type == 5 && s_devices[i].has_garage) count++;
     else if (s_devices[i].type_index == target_type) count++;
   }

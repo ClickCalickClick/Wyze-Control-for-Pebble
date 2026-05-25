@@ -19,11 +19,37 @@ static TextLayer *s_loading_layer;
 static TextLayer *s_event_time_layer;
 static char s_loading_buf[32];
 static char s_event_time_buf[48];
+static int s_progress_percent = -1;
 #else
 static TextLayer *s_status_layer;
 #endif
 
 static int s_device_index = -1;
+
+#ifdef PBL_COLOR
+static void set_loading_percent(int percent) {
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  if (percent < s_progress_percent) return;
+  s_progress_percent = percent;
+  snprintf(s_loading_buf, sizeof(s_loading_buf), "Loading %d%%", s_progress_percent);
+  if (s_loading_layer) {
+    text_layer_set_text(s_loading_layer, s_loading_buf);
+  }
+}
+#endif
+
+#ifdef PBL_COLOR
+static int get_garage_image_height(void) {
+#if defined(PBL_PLATFORM_EMERY)
+  return 132;
+#elif defined(PBL_PLATFORM_GABBRO)
+  return 96;
+#else
+  return 84;
+#endif
+}
+#endif
 
 #ifdef PBL_COLOR
 static void free_image(void) {
@@ -63,7 +89,8 @@ static void window_appear(Window *window) {
 #ifdef PBL_COLOR
     free_image();
     if (s_bitmap_layer) bitmap_layer_set_bitmap(s_bitmap_layer, NULL);
-    if (s_loading_layer) text_layer_set_text(s_loading_layer, "Loading image...");
+    s_progress_percent = -1;
+    set_loading_percent(0);
     if (s_event_time_layer) text_layer_set_text(s_event_time_layer, "");
 
     wyze_set_image_target(1); // Route image data to garage window
@@ -98,15 +125,16 @@ static void window_load(Window *window) {
 #ifdef PBL_COLOR
   // Bitmap layer for camera thumbnail
   int img_y = y + 22;
-  s_bitmap_layer = bitmap_layer_create(GRect(0, img_y, bounds.size.w, 84));
+  int img_h = get_garage_image_height();
+  s_bitmap_layer = bitmap_layer_create(GRect(0, img_y, bounds.size.w, img_h));
   bitmap_layer_set_compositing_mode(s_bitmap_layer, GCompOpSet);
   bitmap_layer_set_alignment(s_bitmap_layer, GAlignCenter);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_bitmap_layer));
-  int text_y = img_y + 84;
+  int text_y = img_y + img_h;
 
   // Loading/progress
   s_loading_layer = text_layer_create(GRect(5, text_y, bounds.size.w - 10, 20));
-  text_layer_set_text(s_loading_layer, "Loading image...");
+  text_layer_set_text(s_loading_layer, "Loading 0%");
   text_layer_set_font(s_loading_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
   text_layer_set_text_alignment(s_loading_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_loading_layer));
@@ -209,10 +237,8 @@ void window_garage_receive_chunk(int chunk_index, int chunk_total, uint8_t *data
   }
   s_chunks_received++;
 
-  snprintf(s_loading_buf, sizeof(s_loading_buf), "Image %d/%d", s_chunks_received, s_chunks_total);
-  if (s_loading_layer) text_layer_set_text(s_loading_layer, s_loading_buf);
-
   if (s_chunks_received >= s_chunks_total) {
+    set_loading_percent(100);
     s_bitmap = gbitmap_create_blank(GSize(s_img_width, s_img_height), GBitmapFormat8Bit);
     if (s_bitmap) {
       uint8_t *bitmap_data = gbitmap_get_data(s_bitmap);
@@ -242,10 +268,17 @@ void window_garage_receive_event(const char *event_type, const char *event_time)
     strncpy(s_event_time_buf, event_time, sizeof(s_event_time_buf) - 1);
     s_event_time_buf[sizeof(s_event_time_buf) - 1] = '\0';
   }
-  if (s_loading_layer) text_layer_set_text(s_loading_layer, "");
   if (s_event_time_layer) text_layer_set_text(s_event_time_layer, s_event_time_buf);
 #else
   (void)event_type; (void)event_time;
+#endif
+}
+
+void window_garage_receive_progress(int percent) {
+#ifdef PBL_COLOR
+  set_loading_percent(percent);
+#else
+  (void)percent;
 #endif
 }
 

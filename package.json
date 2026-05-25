@@ -68,9 +68,25 @@
       "CameraChunkData",
       "CameraWidth",
       "CameraHeight",
+      "CameraProgress",
       "DeviceHasGarage",
       "GarageRequest",
-      "TestAuth"
+      "TestAuth",
+      "VacuumRequest",
+      "VacuumBattery",
+      "VacuumMode",
+      "VacuumModeText",
+      "VacuumAction",
+      "ThermoRequest",
+      "ThermoTemp",
+      "ThermoHumidity",
+      "ThermoMode",
+      "ThermoHeatSP",
+      "ThermoCoolSP",
+      "ThermoFan",
+      "ThermoWorking",
+      "ThermoAction",
+      "ThermoActionValue"
     ],
     "resources": {
       "media": [
