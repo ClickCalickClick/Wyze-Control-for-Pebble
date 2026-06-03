@@ -61,9 +61,9 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
   if (s_auth_state == 0) {
       snprintf(buf, sizeof(buf), "Open Settings on phone");
   } else if (s_auth_state == 1) {
-      snprintf(buf, sizeof(buf), "Loading...");
+      snprintf(buf, sizeof(buf), "%s", s_auth_message[0] ? s_auth_message : "Loading...");
   } else if (s_auth_state == 3) {
-      snprintf(buf, sizeof(buf), "Refreshing...");
+      snprintf(buf, sizeof(buf), "%s", s_auth_message[0] ? s_auth_message : "Refreshing...");
   } else if (count == 0) {
       snprintf(buf, sizeof(buf), "0 Devices");
   } else {

@@ -66,9 +66,9 @@ module.exports = function createClayConfig(statusHtml) {
         {
           "type": "toggle",
           "messageKey": "WyzeAutoReauth",
-          "defaultValue": false,
-          "label": "Auto Re-auth (Optional)",
-          "description": "If enabled, stores a one-way password hash on this phone to automatically recover sessions when tokens expire."
+          "defaultValue": true,
+          "label": "Stay Signed In",
+          "description": "Recommended. Stores a scrambled form of your password on this phone so the app can reconnect automatically when your session expires — no need to re-enter your password. Note: this stored value can sign in to your Wyze account, so turn it off if you don't want it kept on this phone."
         },
         {
           "type": "toggle",

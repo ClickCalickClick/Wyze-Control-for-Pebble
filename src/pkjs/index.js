@@ -228,6 +228,14 @@ function sendAuthStatusToWatch(status) {
   });
 }
 
+// Send a short free-text progress line to the watch so the user sees what the
+// app is doing during auth/reconnect (e.g. "Checking sign-in…", "Reconnecting…").
+function sendAuthProgressToWatch(text) {
+  Pebble.sendAppMessage({ "AuthMessage": String(text || '') }, null, function() {
+    console.log('Failed to send AuthMessage to watch');
+  });
+}
+
 // authenticateWyze now takes an optional rawPassword parameter (already wiped from storage).
 // On app launch (ready event), pass null — it will use the cached token.
 function authenticateWyze(rawPassword, callback) {
@@ -242,6 +250,8 @@ function authenticateWyze(rawPassword, callback) {
     if (!localStorage.getItem('wyze_access_token')) {
       setAuthStatus('error', 'API Key and Key ID are required.');
       sendAuthStatusToWatch(0);
+      if (callback) callback(new Error('missing_api_credentials'));
+      return;
     }
     if (callback) callback();
     return;
@@ -284,17 +294,20 @@ function authenticateWyze(rawPassword, callback) {
             localStorage.setItem('wyze_access_token', res.access_token);
             localStorage.setItem('wyze_refresh_token', res.refresh_token);
             setAuthStatus('success', 'Token created and stored successfully.');
-            if (callback) callback();
+            if (callback) callback(null);
           } else if (res.mfa_options && res.mfa_options.length) {
             console.log('MFA challenge returned.');
             setAuthStatus('error', 'MFA challenge required. Not yet supported.');
+            if (callback) callback(new Error('mfa_required'));
           } else {
             console.log('No access_token in response.');
             setAuthStatus('error', 'Token not present in Wyze response.');
+            if (callback) callback(new Error('no_access_token'));
           }
         } catch (e) {
           console.log('Login parse error:', e);
           setAuthStatus('error', 'Could not parse login response.');
+          if (callback) callback(new Error('parse_error'));
         }
       } else {
         console.log('Wyze login failed:', req.status);
@@ -306,10 +319,12 @@ function authenticateWyze(rawPassword, callback) {
           }
         } catch (parseErr) {}
         setAuthStatus('error', failureMessage);
+        if (callback) callback(new Error('login_http_' + req.status));
       }
     };
     req.onerror = function() {
       setAuthStatus('error', 'Network error contacting Wyze.');
+      if (callback) callback(new Error('network_error'));
     };
     req.send(JSON.stringify({
       email: SETTINGS.WyzeEmail,
@@ -324,11 +339,12 @@ function authenticateWyze(rawPassword, callback) {
     if (localStorage.getItem('wyze_auth_status') !== 'success') {
       setAuthStatus('success', 'Using saved token.');
     }
-    if (callback) callback();
+    if (callback) callback(null);
   } else {
     console.log('No password provided and no cached token.');
     setAuthStatus('error', 'Enter email and password to authenticate.');
     sendAuthStatusToWatch(0);
+    if (callback) callback(new Error('no_credentials'));
   }
 }
 
@@ -429,6 +445,103 @@ function sendNextDevice(index) {
   });
 }
 
+// Recover an expired/invalid session: refresh the token, and if that hard-fails,
+// clear tokens and re-login using the saved password hash (when auto re-auth is
+// enabled). Transient failures are retried with backoff. callback(err) — err null
+// means a usable token is now in wyzeToken.
+function recoverAuth(callback) {
+  sendAuthProgressToWatch('Reconnecting\u2026');
+  setAuthStatus('pending', 'Reconnecting to Wyze...');
+  refreshWyzeToken(function(result) {
+    if (result && result.ok) {
+      s_refresh_retry_attempts = 0;
+      sendAuthProgressToWatch('Signed in');
+      if (callback) callback(null);
+      return;
+    }
+
+    if (result && result.hardFailure) {
+      clearAuthTokens();
+      if (hasSavedReauthHash()) {
+        sendAuthProgressToWatch('Reconnecting\u2026');
+        setAuthStatus('pending', 'Attempting automatic re-auth...');
+        authenticateWyze(null, function(err) {
+          if (!err && wyzeToken) {
+            s_refresh_retry_attempts = 0;
+            sendAuthProgressToWatch('Signed in');
+            if (callback) callback(null);
+          } else {
+            setAuthStatus('error', 'Session expired. Auto re-auth failed — re-enter password.');
+            sendAuthStatusToWatch(0);
+            if (callback) callback(err || new Error('reauth_failed'));
+          }
+        });
+      } else {
+        setAuthStatus('error', 'Session expired. Re-enter password to reconnect.');
+        sendAuthStatusToWatch(0);
+        if (callback) callback(new Error('session_expired'));
+      }
+      return;
+    }
+
+    // Transient failure — retry refresh with backoff.
+    s_refresh_retry_attempts += 1;
+    if (s_refresh_retry_attempts <= REFRESH_RETRY_MAX) {
+      var delay = REFRESH_RETRY_BASE_MS * s_refresh_retry_attempts;
+      setAuthStatus('pending', 'Temporary network issue. Retrying...');
+      sendAuthProgressToWatch('Reconnecting\u2026');
+      setTimeout(function() {
+        recoverAuth(callback);
+      }, delay);
+    } else {
+      s_refresh_retry_attempts = 0;
+      setAuthStatus('error', 'Refresh failed due to temporary network errors. Try again.');
+      sendAuthStatusToWatch(2);
+      if (callback) callback(new Error('transient_exhausted'));
+    }
+  });
+}
+
+// Proactively guarantee a usable token before making a request. Emits progress to
+// the watch. callback(err) — err null means wyzeToken is ready to use. If there is
+// no token and we cannot reconnect automatically, the watch is set to "no auth".
+function ensureAuth(callback) {
+  // Already have an in-memory token — good to go. Per-request 401 recovery will
+  // catch the case where it has silently expired.
+  if (wyzeToken) {
+    if (callback) callback(null);
+    return;
+  }
+
+  var cachedAccessToken = localStorage.getItem('wyze_access_token');
+  if (cachedAccessToken) {
+    wyzeToken = cachedAccessToken;
+    if (callback) callback(null);
+    return;
+  }
+
+  // No token at all. If we can reconnect using the saved hash, do it silently.
+  if (hasSavedReauthHash()) {
+    sendAuthProgressToWatch('Reconnecting\u2026');
+    setAuthStatus('pending', 'Attempting automatic re-auth...');
+    authenticateWyze(null, function(err) {
+      if (!err && wyzeToken) {
+        sendAuthProgressToWatch('Signed in');
+        if (callback) callback(null);
+      } else {
+        sendAuthStatusToWatch(0);
+        if (callback) callback(err || new Error('reauth_failed'));
+      }
+    });
+    return;
+  }
+
+  // Nothing we can do automatically — user must sign in via Clay settings.
+  setAuthStatus('error', 'Sign in needed. Open settings to enter your password.');
+  sendAuthStatusToWatch(0);
+  if (callback) callback(new Error('no_session'));
+}
+
 function fetchDevices() {
   if (!wyzeToken) return;
   var req = new XMLHttpRequest();
@@ -450,48 +563,13 @@ function fetchDevices() {
         sendAuthStatusToWatch(2);
       }
     } else if (req.readyState === 4 && (req.status === 401 || (req.status === 200 && tryParseCode(req.responseText) === 2001))) {
-      // Token expired — try refresh before giving up
-      console.log('Token expired, attempting refresh...');
-      refreshWyzeToken(function(result) {
-        if (result && result.ok) {
-          s_refresh_retry_attempts = 0;
+      // Token expired — try to recover the session, then reload on success.
+      console.log('Token expired, attempting recovery...');
+      recoverAuth(function(err) {
+        if (!err) {
           fetchDevices();
-          return;
         }
-
-        if (result && result.hardFailure) {
-          clearAuthTokens();
-          if (hasSavedReauthHash()) {
-            setAuthStatus('pending', 'Attempting automatic re-auth...');
-            authenticateWyze(null, function() {
-              if (wyzeToken) {
-                s_refresh_retry_attempts = 0;
-                fetchDevices();
-              } else {
-                setAuthStatus('error', 'Session expired. Auto re-auth failed — re-enter password.');
-                sendAuthStatusToWatch(0);
-              }
-            });
-          } else {
-            setAuthStatus('error', 'Session expired. Re-enter password to reconnect.');
-            sendAuthStatusToWatch(0);
-          }
-          return;
-        }
-
-        s_refresh_retry_attempts += 1;
-        if (s_refresh_retry_attempts <= REFRESH_RETRY_MAX) {
-          var delay = REFRESH_RETRY_BASE_MS * s_refresh_retry_attempts;
-          setAuthStatus('pending', 'Temporary network issue. Retrying...');
-          sendAuthStatusToWatch(2);
-          setTimeout(function() {
-            fetchDevices();
-          }, delay);
-        } else {
-          s_refresh_retry_attempts = 0;
-          setAuthStatus('error', 'Refresh failed due to temporary network errors. Try again.');
-          sendAuthStatusToWatch(2);
-        }
+        // On failure, recoverAuth has already set the error status and watch state.
       });
     } else if (req.readyState === 4) {
       console.log('Device fetch HTTP error: ' + req.status);
@@ -505,6 +583,11 @@ function fetchDevices() {
 
 function tryParseCode(text) {
   try { return JSON.parse(text).code; } catch(e) { return null; }
+}
+
+// True when an XHR response indicates the access token is expired/invalid.
+function isExpiredResponse(req) {
+  return req.status === 401 || (req.status === 200 && tryParseCode(req.responseText) === 2001);
 }
 
 function refreshWyzeToken(callback) {
@@ -562,7 +645,7 @@ function refreshWyzeToken(callback) {
   req.send(JSON.stringify(payload));
 }
 
-function toggleDevice(id) {
+function toggleDevice(id, isRetry) {
   var dev = deviceList[id];
   if (!dev || !wyzeToken) return;
   
@@ -570,6 +653,14 @@ function toggleDevice(id) {
   req.open('POST', 'https://api.wyzecam.com/app/v2/device/set_property', true);
   req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
   req.onload = function() {
+    if (req.readyState === 4 && isExpiredResponse(req) && !isRetry) {
+      console.log('Toggle hit expired token, recovering...');
+      recoverAuth(function(err) {
+        if (!err) toggleDevice(id, true);
+        else Pebble.sendAppMessage({ "DeviceIndex": id, "DeviceState": dev.state });
+      });
+      return;
+    }
     if (req.readyState === 4 && req.status === 200) {
        try {
          var json = JSON.parse(req.responseText);
@@ -672,7 +763,7 @@ function setDeviceProperty(id, actionType, actionValue) {
 }
 
 // Garage door control: blind toggle via run_action
-function garageControl(id, actionValue) {
+function garageControl(id, actionValue, isRetry) {
   var dev = deviceList[id];
   if (!dev || !wyzeToken) return;
   console.log('Garage toggle device ' + id + ': ' + dev.name);
@@ -680,6 +771,13 @@ function garageControl(id, actionValue) {
   req.open('POST', 'https://api.wyzecam.com/app/v2/auto/run_action', true);
   req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
   req.onload = function() {
+    if (req.readyState === 4 && isExpiredResponse(req) && !isRetry) {
+      console.log('Garage trigger hit expired token, recovering...');
+      recoverAuth(function(err) {
+        if (!err) garageControl(id, actionValue, true);
+      });
+      return;
+    }
     if (req.readyState === 4 && req.status === 200) {
       try {
         var json = JSON.parse(req.responseText);
@@ -713,13 +811,21 @@ function garageControl(id, actionValue) {
 // Shortcuts
 var shortcutList = [];
 
-function fetchShortcuts() {
+function fetchShortcuts(isRetry) {
   if (!wyzeToken) return;
   console.log('Fetching shortcuts...');
   var req = new XMLHttpRequest();
   req.open('POST', 'https://api.wyzecam.com/app/v2/auto/run_action_list', true);
   req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
   req.onload = function() {
+    if (req.readyState === 4 && isExpiredResponse(req) && !isRetry) {
+      console.log('Shortcuts hit expired token, recovering...');
+      recoverAuth(function(err) {
+        if (!err) fetchShortcuts(true);
+        else Pebble.sendAppMessage({"ShortcutCount": 0});
+      });
+      return;
+    }
     if (req.readyState === 4 && req.status === 200) {
       try {
         var json = JSON.parse(req.responseText);
@@ -1575,7 +1681,13 @@ Pebble.addEventListener('ready', function(e) {
   console.log('JS Ready.');
   syncSettingsFromClayStorage();
   sendAuthStatusToWatch(1);
-  authenticateWyze(null, function() {
+  sendAuthProgressToWatch('Checking sign-in…');
+  ensureAuth(function(err) {
+    if (err) {
+      // ensureAuth has already set the watch to a "sign in needed" state.
+      return;
+    }
+    sendAuthProgressToWatch('Loading…');
     fetchDevices();
     fetchShortcuts();
   });
@@ -1626,8 +1738,13 @@ Pebble.addEventListener('webviewclosed', function(event) {
     return;
   }
   
-  authenticateWyze(rawPassword, function() {
+  authenticateWyze(rawPassword, function(err) {
+    if (err) {
+      // authenticateWyze has already recorded the error status for Clay/watch.
+      return;
+    }
     sendAuthStatusToWatch(1);
+    sendAuthProgressToWatch('Loading…');
     fetchDevices();
   });
 });

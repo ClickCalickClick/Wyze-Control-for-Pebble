@@ -33,6 +33,7 @@
     "messageKeys": [
       "AppReady",
       "AuthStatus",
+      "AuthMessage",
       "DeviceCount",
       "DeviceTypeIndex",
       "DeviceType",

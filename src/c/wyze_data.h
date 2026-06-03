@@ -24,6 +24,10 @@ extern int s_device_count;
 // 3 = refreshing (has cached data, fetching updates)
 extern int s_auth_state;
 
+// Optional free-text progress line from the phone (e.g. "Reconnecting…").
+// Empty string means "no override" — fall back to the default state text.
+extern char s_auth_message[32];
+
 void wyze_app_message_init(void);
 void wyze_data_request_refresh(void);
 void wyze_data_toggle_device(int device_id);

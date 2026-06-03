@@ -12,6 +12,7 @@ extern uint32_t MESSAGE_KEY_ActionToggle;
 extern uint32_t MESSAGE_KEY_ActionType;
 extern uint32_t MESSAGE_KEY_ActionValue;
 extern uint32_t MESSAGE_KEY_AppReady;
+extern uint32_t MESSAGE_KEY_AuthMessage;
 extern uint32_t MESSAGE_KEY_AuthStatus;
 extern uint32_t MESSAGE_KEY_CameraChunkData;
 extern uint32_t MESSAGE_KEY_CameraChunkIndex;

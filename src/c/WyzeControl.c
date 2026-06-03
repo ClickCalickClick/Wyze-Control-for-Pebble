@@ -4,6 +4,7 @@
 WyzeDevice s_devices[MAX_DEVICES];
 int s_device_count = 0;
 int s_auth_state = 0;
+char s_auth_message[32] = "";
 
 // Image target routing: 0=camera window, 1=garage window
 static int s_image_target = 0;
@@ -12,6 +13,15 @@ void wyze_set_image_target(int target) { s_image_target = target; }
 int wyze_get_image_target(void) { return s_image_target; }
 
 static void in_recv_handler(DictionaryIterator *iter, void *context) {
+  // Free-text progress line from the phone (e.g. "Reconnecting…", "Loading…").
+  Tuple *msg_t = dict_find(iter, MESSAGE_KEY_AuthMessage);
+  if (msg_t) {
+    strncpy(s_auth_message, msg_t->value->cstring, sizeof(s_auth_message) - 1);
+    s_auth_message[sizeof(s_auth_message) - 1] = '\0';
+    menu_types_reload_data();
+    return;
+  }
+
   // Auth status from JS: 0=no auth, 1=authed/loading
   Tuple *auth_t = dict_find(iter, MESSAGE_KEY_AuthStatus);
   if (auth_t) {
@@ -19,6 +29,10 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
     // Don't downgrade from "refreshing" (3) to "loading" (1)
     if (!(s_auth_state == 3 && new_state == 1)) {
       s_auth_state = new_state;
+    }
+    // Clear stale progress text once we reach a terminal state.
+    if (s_auth_state == 0 || s_auth_state == 2) {
+      s_auth_message[0] = '\0';
     }
     APP_LOG(APP_LOG_LEVEL_INFO, "Auth status: %d", s_auth_state);
     menu_types_reload_data();
@@ -30,6 +44,7 @@ static void in_recv_handler(DictionaryIterator *iter, void *context) {
     s_device_count = count_t->value->int32;
     if (s_device_count > MAX_DEVICES) s_device_count = MAX_DEVICES;
     s_auth_state = 2;
+    s_auth_message[0] = '\0';
     APP_LOG(APP_LOG_LEVEL_INFO, "Preparing for %d devices", s_device_count);
     // If count is 0 (e.g. logout or no devices), refresh menu immediately
     if (s_device_count == 0) {
